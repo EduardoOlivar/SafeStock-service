@@ -1,0 +1,7 @@
+django
+djangorestframework
+mysqlclient
+django-filter
+django-cors-headers
+djangorestframework_simplejwt
+django_rest_passwordreset

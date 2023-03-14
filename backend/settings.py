@@ -101,7 +101,7 @@ else:
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'safe_stock',
             'USER': 'root',
-            'PASSWORD': 'Password_8899',
+            'PASSWORD': '1234',
             'HOST': 'localhost',
             'PORT': '3306'
         }

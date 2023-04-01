@@ -4,7 +4,7 @@ from backend.settings import TASK_UPLOAD_FILE_TYPES, TASK_UPLOAD_FILE_MAX_SIZE
 import magic
 
 
-generic_fields = ['created', 'updated', 'is_deleted']
+generic_fields = ['creation_date', 'last_update', 'is_deleted']
 
 
 """Serializadores para mostrar datos de usuario"""
@@ -69,7 +69,7 @@ class UserProfileSerializer(UserSerializer):
     shop = ShopReplaceSerializer()
 
 
-class RegistrationSerializer(serializers.ModelSerializer):
+class SignupSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(style={"input_type": "password"}, write_only=True)
 
     class Meta:

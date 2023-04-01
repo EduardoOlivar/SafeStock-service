@@ -45,9 +45,9 @@ class UserProfileView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class SingUpView(APIView):
+class SignUpView(APIView):
     def post(self, request):
-        serializer = RegistrationSerializer(data=request.data)
+        serializer = SignupSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)

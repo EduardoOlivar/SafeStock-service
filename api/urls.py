@@ -20,7 +20,7 @@ urlpatterns = [
     re_path(r'^finances/(?P<pk>[0-9]+)/$', views.FinancesDetail.as_view()),
     re_path(r'^user_finances/all/$', views.UserFinancesListCreate.as_view()),
     re_path(r'^user_finances/(?P<pk>[0-9]+)/$', views.UserFinancesDetail.as_view()),
-    re_path(r'^suppliers/(?P<pk>[0-9]+)/$', views.SupplierListCreate.as_view()),
+    re_path(r'^suppliers/all/$', views.SupplierListCreate.as_view()),
     re_path(r'^suppliers/(?P<pk>[0-9]+)/$', views.SupplierDetail.as_view()),
     re_path(r'^user_suppliers/all/$', views.UserSuppliersCreate.as_view()),
     re_path(r'^user_suppliers/(?P<pk>[0-9]+)/$', views.UserSuppliersDetail.as_view()),
@@ -42,7 +42,7 @@ urlpatterns += [
     re_path(r'^api/token-refresh/$', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),# endpoint para refresh token
     re_path(r'^api/change_password/$', views.ChangePasswordView.as_view(), name='change_password'),# endpoint para cambiar la contraseña
     re_path(r'^user/profile/$', views.UserProfileView.as_view()),  # endpoint para ver perfil de user
-    re_path(r'^api/sing_up/$', views.SingUpView.as_view()),  # endpoint para registrarte
+    re_path(r'^api/sign_up/$', views.SignUpView.as_view()),  # endpoint para registrarte
     re_path(r'^api/login/$', views.LoginView.as_view()),  # endpoint para login
 
 ]

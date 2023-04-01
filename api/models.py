@@ -7,8 +7,8 @@ common_args = {'null': True, 'blank': True} #atributos generales
 
 
 class GenericAttributes(models.Model):
-    created = models.DateTimeField(**common_args, auto_now_add=True, editable=False)  # para saber cuando fue creado el dato
-    updated = models.DateTimeField(**common_args, auto_now=True) # para saber cuando se actualizo el dato
+    creation_date = models.DateTimeField(**common_args, auto_now_add=True, editable=False)  # para saber cuando fue creado el dato
+    last_update = models.DateTimeField(**common_args, auto_now=True) # para saber cuando se actualizo el dato
     is_deleted = models.BooleanField(**common_args, default=False) #para un borrado logico de las vistas no borrado fisico de la bd
 
     class Meta:
@@ -94,9 +94,9 @@ class Shop(GenericAttributes):
     commune = models.TextField(**common_args)
     address = models.TextField(**common_args)
     shop_type = models.TextField(**common_args)
-    open_days = models.DateField(**common_args)
+    open_days = models.IntegerField(**common_args)
     opens_at = models.DateTimeField(**common_args)
-    close_at = models.DateTimeField(**common_args)
+    close_at = models.TimeField(**common_args)
 
 
 class Category(GenericAttributes):

@@ -44,5 +44,7 @@ urlpatterns += [
     re_path(r'^user/profile/$', views.UserProfileView.as_view()),  # endpoint para ver perfil de user
     re_path(r'^api/sign_up/$', views.SignUpView.as_view()),  # endpoint para registrarte
     re_path(r'^api/login/$', views.LoginView.as_view()),  # endpoint para login
+    re_path(r'^api/send_reset_password_email/$', views.SendPasswordResetEmailView.as_view(), name='send_reset_password_email'),#endpoint para pedir un cambio de contraseña via mail
+    path('api/reset_password/<uid>/<token>/', views.UserPasswordResetView.as_view(), name='reset_password'),#endpoint para ccambiar la contraseña si se tiene uid y el token asignado
 
 ]

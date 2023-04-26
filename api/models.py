@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import (AbstractUser)
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager,PermissionsMixin
 
 # Create your models here.
 
@@ -15,20 +15,52 @@ class GenericAttributes(models.Model):
         abstract = True
 
 
-class Users(AbstractUser, GenericAttributes):
-    name = models.TextField(**common_args)
-    image_file = models.FileField(upload_to='user/images/', **common_args)
+class UserManager(BaseUserManager):
+    def create_user(self, email, password=None):
+        if not email:
+            raise ValueError('Users must have an email address')
+
+        user = self.model(
+            email=self.normalize_email(email),
+        )
+
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, password=None):
+        user = self.create_user(
+            email,
+            password=password,
+        )
+        user.is_admin = True
+        user.save(using=self._db)
+        return user
+
+
+class Users(AbstractBaseUser, PermissionsMixin,GenericAttributes):
+    email = models.EmailField(max_length=255, unique=True, **common_args)
+    username = models.TextField(**common_args)
+    image_file = models.FileField(upload_to='user/images/')
     phone_number = models.TextField(**common_args)
     token = models.TextField(**common_args)
     last_session = models.DateTimeField(**common_args)
-    is_validated = models.BooleanField(default=False)
+    is_validated = models.BooleanField(**common_args,default=False)
+    is_staff = models.BooleanField(**common_args,default=False)
+    is_admin = models.BooleanField(**common_args, default=False)
 
-    @property
-    def is_admin(self, user):
-        return user.is_superuser
+    USERNAME_FIELD = 'email'
+
+    objects = UserManager()
 
     def __str__(self):
         return self.email
+
+    def has_perm(self, perm, obj=None):
+        return self.is_staff
+
+    def has_module_perms(self, app_label):
+        return self.is_staff
 
 
 class ReportSettings(GenericAttributes):

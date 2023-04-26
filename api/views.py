@@ -76,12 +76,33 @@ class LoginView(APIView):
         email = serializer.data.get('email')
         password = serializer.data.get('password')
         user = authenticate(email=email, password=password)
+        print(user)
         if user is not None:
             token = get_tokens_for_user(user)
             return Response({'token': token, 'msg': 'Inicio de sesión exitoso','status': 'ok'}, status=status.HTTP_200_OK)
         else:
             return Response({'errors': {'error_de_campo': ['Email o contraseña invalidos']}},
                             status=status.HTTP_404_NOT_FOUND)
+
+
+class SendPasswordResetEmailView(APIView):
+    renderer_classes = [UserRenderer]
+
+    def post(self, request, format=None):
+        serializer = SendPasswordResetEmailSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response({'msg': 'Link para reiniciar contraseña enviado'}, status=status.HTTP_200_OK)
+
+
+class UserPasswordResetView(APIView):
+    renderer_classes = [UserRenderer]
+
+    def post(self, request, uid, token, format=None):
+        serializer = UserPasswordResetSerializer(data=request.data, context={'uid':uid,'token':token})
+        serializer.is_valid(raise_exception=True)
+        return Response({'msg':'Cambio de contraseña exitoso'}, status=status.HTTP_200_OK)
+
+
 
 
 """Demas controladores"""

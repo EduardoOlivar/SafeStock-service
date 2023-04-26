@@ -1,6 +1,3 @@
-# Backend Pre-PAES
-## Daniel Duran - José Olivar - Luis Romero
-
 Para iniciar el backend es necesario recrear ciertos pasos previamente en su IDE.
 Primero clonar la repo, luego en la carpeta que se descarga, se abre con el IDE, y tiene escribir los siguientes comandos en la terminal
 
@@ -22,7 +19,7 @@ En settings.py que esta dentro de la carpeta backend se debe encontrar esta part
    DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'proyecto_web',
+            'NAME': 'safe_stock',
             'USER': 'root',
             'PASSWORD': '',
             'HOST': 'localhost',

@@ -1,6 +1,3 @@
-# Backend Pre-PAES
-## Daniel Duran - José Olivar - Luis Romero
-
 Para iniciar el backend es necesario recrear ciertos pasos previamente en su IDE.
 Primero clonar la repo, luego en la carpeta que se descarga, se abre con el IDE, y tiene escribir los siguientes comandos en la terminal
 
@@ -22,7 +19,7 @@ En settings.py que esta dentro de la carpeta backend se debe encontrar esta part
    DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'proyecto_web',
+            'NAME': 'safe_stock',
             'USER': 'root',
             'PASSWORD': '',
             'HOST': 'localhost',
@@ -35,19 +32,11 @@ Aquí debe incluir la contraseña de su base de datos en la key
 
 ```'PASSWORD': 'Aquí poner su contraseña'``` 
 
-Cuando ya se tenga la contraseña, en MySQL Workbench debe crear un schema con este nombre "proyecto_web", al tener creado el esquema, debe ir a su IDE y escribir el siguiente comando
+Cuando ya se tenga la contraseña, en MySQL Workbench debe crear un schema con este nombre "safe_stock", al tener creado el esquema, debe ir a su IDE y escribir el siguiente comando
 
 ```py manage.py migrate```
 
 Este comando creara la base de datos con sus tablas a traves del ORM de Django.
-
-Para poblar las tablas de la base de datos es necesario ocupar el siguiente comando.
-
-```py manage.py shell < scripts/main.py```
-
-En caso de que se equivoque al poblar la data escribir el siguiente comando, solo borra las tablas de ensayos, preguntas, respuestas, la tabla de usuarios sigue con la data con la que se registraron.
-
-```py manage.py shell < scripts/reset_db.py```
 
 Luego de esto escribir el siguiente comando para inicializar el servidor.
 

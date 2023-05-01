@@ -6,10 +6,22 @@ from api.renderers import UserRenderer
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate, logout
 from rest_framework import status
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from api.models import *
 from rest_framework.permissions import IsAuthenticated
+from django.db import connections
+
+
 # Create your views here.
+
+@api_view(['GET'])
+def server_status(request):
+    try:
+        connections['default'].cursor()
+        return Response({'status': 'ok'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'status': 'error', 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 def get_tokens_for_user(user):
@@ -37,7 +49,7 @@ class UsersDetail(generics.RetrieveUpdateAPIView):
 
 
 class UserProfileView(APIView):
-    renderer_classes = [UserRenderer,]
+    renderer_classes = [UserRenderer, ]
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
@@ -79,7 +91,8 @@ class LoginView(APIView):
         print(user)
         if user is not None:
             token = get_tokens_for_user(user)
-            return Response({'token': token, 'msg': 'Inicio de sesión exitoso','status': 'ok'}, status=status.HTTP_200_OK)
+            return Response({'token': token, 'msg': 'Inicio de sesión exitoso', 'status': 'ok'},
+                            status=status.HTTP_200_OK)
         else:
             return Response({'errors': {'error_de_campo': ['Email o contraseña invalidos']}},
                             status=status.HTTP_404_NOT_FOUND)
@@ -98,11 +111,9 @@ class UserPasswordResetView(APIView):
     renderer_classes = [UserRenderer]
 
     def post(self, request, uid, token, format=None):
-        serializer = UserPasswordResetSerializer(data=request.data, context={'uid':uid,'token':token})
+        serializer = UserPasswordResetSerializer(data=request.data, context={'uid': uid, 'token': token})
         serializer.is_valid(raise_exception=True)
-        return Response({'msg':'Cambio de contraseña exitoso'}, status=status.HTTP_200_OK)
-
-
+        return Response({'msg': 'Cambio de contraseña exitoso'}, status=status.HTTP_200_OK)
 
 
 """Demas controladores"""
@@ -268,5 +279,3 @@ class UserDebtorItemsDetail(generics.RetrieveUpdateAPIView):
     queryset = UserDebtorItems.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = UserDebtorItemsSerializer
     permission_classes = (IsAuthenticated,)
-
-

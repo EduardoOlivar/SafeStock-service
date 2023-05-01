@@ -5,6 +5,7 @@ from rest_framework_simplejwt import views as jwt_views
 
 #endpoint restful
 urlpatterns = [
+    path('status', views.server_status),
     re_path(r'^users/all/$', views.UserListCreate.as_view()), #endpoint para consultar listado de usuarios
     re_path(r'^user/(?P<pk>[0-9]+)/$', views.UsersDetail.as_view()),# endpoint para consultar usuario especifico, eliminarlo ,recuperarlo o updatearlo
     re_path(r'^shops/all/$', views.ShopListCreate.as_view()),

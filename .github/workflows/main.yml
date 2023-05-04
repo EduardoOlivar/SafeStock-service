@@ -20,7 +20,12 @@ jobs:
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
       - name: compose down
         working-directory: /home/${{ secrets.SSH_USER }}/server
-        run: docker-compose down
+        run: |
+          if [ -f docker-compose.yml ]; then
+            docker-compose down
+          else
+            echo "No existe el archivo docker-compose.yml"
+          fi
       - name: rsync
         uses: burnett01/rsync-deployments@5.2.1
         with:
@@ -32,7 +37,12 @@ jobs:
           remote_key: ${{ secrets.SSH_KEY }}
       - name: compose up
         working-directory: /home/${{ secrets.SSH_USER }}/server
-        run: docker-compose up --build --detach
+        run: |
+          if [ -f docker-compose.yml ]; then
+            docker-compose up --build --detach
+          else
+            echo "No existe el archivo docker-compose.yml"
+          fi
       
         
 

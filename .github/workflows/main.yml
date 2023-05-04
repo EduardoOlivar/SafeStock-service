@@ -3,7 +3,8 @@ name: deploy
 on:
   push:
     branches: 
-      - actions-test
+      - master
+
     
 jobs:
   build:
@@ -12,38 +13,19 @@ jobs:
       - name: checkout
         uses: actions/checkout@v3
         with:
-          ref: actions-test
+          ref: master
       - name: install SSH key
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.SSH_KEY }}
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
       - name: compose down
-        working-directory: /home/${{ secrets.SSH_USER }}/server
-        run: |
-          if [ -f docker-compose.yml ]; then
-            docker-compose down
-          else
-            echo "No existe el archivo docker-compose.yml"
-          fi
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "cd /home/${{ secrets.SSH_USER }}/server && if [ -f docker-compose.yml ]; then docker-compose down; else echo 'No existe el archivo docker-compose.yml'; fi"
       - name: rsync
-        uses: burnett01/rsync-deployments@5.2.1
-        with:
-          switches: -avzr --delete
-          path: .
-          remote_path: /home/${{ secrets.SSH_USER }}/server
-          remote_host: ${{ secrets.SERVER_IP }}
-          remote_user: ${{ secrets.SSH_USER }}
-          remote_key: ${{ secrets.SSH_KEY }}
-      - name: compose up
-        working-directory: /home/${{ secrets.SSH_USER }}/server
         run: |
-          if [ -f docker-compose.yml ]; then
-            docker-compose up --build --detach
-          else
-            echo "No existe el archivo docker-compose.yml"
-          fi
-      
-        
-
-      
+          sudo apt-get update && sudo apt-get install -y rsync
+          rsync -avz . ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SSH_USER }}/server/
+      - name: secrets
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "echo 'export SERVER_IP=${{ secrets.SERVER_IP }}' >> ~/.bashrc"
+      - name: compose up
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "cd /home/${{ secrets.SSH_USER }}/server && if [ -f docker-compose.yml ]; then docker-compose up --build --detach; else echo 'No existe el archivo docker-compose.yml'; fi"

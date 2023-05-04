@@ -1,4 +1,5 @@
 #!/bin/bash
+
 echo "-- MakeMigrations --"
 python manage.py makemigrations api
 echo ====================================

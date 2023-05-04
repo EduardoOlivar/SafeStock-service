@@ -27,7 +27,12 @@ SECRET_KEY = 'django-insecure-jmotql6sn-bb9ypdlyr*5ljfko2kk@6g75chg7ql&9o242*8w!
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    os.environ.get('DB_IP', '172.28.1.2'),
+    os.environ.get('SERVER_IP', '0.0.0.0')
+]
 AUTH_USER_MODEL = 'api.Users'
 
 
@@ -107,11 +112,11 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'safe_stock',
-            'USER': 'root',
-            'PASSWORD': '',
-            'HOST': 'localhost',
-            'PORT': '3306'
+            'NAME': os.environ.get('DB_DATABASE', 'safe_stock'),
+            'USER': os.environ.get('DB_USER', 'root'),
+            'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+            'HOST': os.environ.get('DB_IP', '0.0.0.0'),
+            'PORT': os.environ.get('DB_PORT', '3306')
         }
     }
 

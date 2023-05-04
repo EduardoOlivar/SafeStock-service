@@ -36,7 +36,7 @@ services:
       DB_HOST: $DB_HOST
       DB_PORT: $DB_PORT
       DB_IP: 172.28.1.2
-      SERVER_IP: ${SERVER_IP} # exportada desde github actions en el servidor
+      INTERNAL_IP: 172.28.1.1
     depends_on:
       - db
     networks:

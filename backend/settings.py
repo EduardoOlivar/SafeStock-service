@@ -30,8 +30,8 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    os.environ.get('DB_IP', '172.28.1.2'),
-    os.environ.get('SERVER_IP', '0.0.0.0')
+    '54.85.156.164',
+    os.environ.get('INTERNAL_IP', '0.0.0.0'),
 ]
 AUTH_USER_MODEL = 'api.Users'
 

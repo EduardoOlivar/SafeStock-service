@@ -27,8 +27,12 @@ SECRET_KEY = 'django-insecure-jmotql6sn-bb9ypdlyr*5ljfko2kk@6g75chg7ql&9o242*8w!
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-LOCAL_DEPLOYMENT = os.environ.get('IS_PRODUCTION', 'false') == 'false'
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    os.environ.get('DB_IP', '172.28.1.2'),
+    os.environ.get('SERVER_IP', '0.0.0.0')
+]
 AUTH_USER_MODEL = 'api.Users'
 
 
@@ -65,6 +69,15 @@ REST_FRAMEWORK = {
     ],
 }
 
+SIMPLE_JWT = {
+    'SIGNING_KEY': SECRET_KEY,
+    'UPDATE_LAST_LOGIN': True,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=7),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7)
+}
+
+
 ROOT_URLCONF = 'backend.urls'
 
 TEMPLATES = [
@@ -99,11 +112,11 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'safe_stock',
-            'USER': 'root',
-            'PASSWORD': '1234',
-            'HOST': 'localhost',
-            'PORT': '3306'
+            'NAME': os.environ.get('DB_DATABASE', 'safe_stock'),
+            'USER': os.environ.get('DB_USER', 'root'),
+            'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+            'HOST': os.environ.get('DB_IP', '0.0.0.0'),
+            'PORT': os.environ.get('DB_PORT', '3306')
         }
     }
 
@@ -164,19 +177,15 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
-SIMPLE_JWT = {
-    'SIGNING_KEY': SECRET_KEY,
-    'UPDATE_LAST_LOGIN': True,
-    'AUTH_HEADER_TYPES': ('Bearer',),
-}
 
-if LOCAL_DEPLOYMENT:
-    SIMPLE_JWT = {
-        **SIMPLE_JWT,
-        **{
-            'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=3),
-            'REFRESH_TOKEN_LIFETIME': timedelta(days=3)
-        }
-    }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Email Configuration
+EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'safestock.app@gmail.com'
+EMAIL_HOST_PASSWORD = ''
+EMAIL_USE_TLS = True

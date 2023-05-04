@@ -1,0 +1,31 @@
+name: deploy
+
+on:
+  push:
+    branches: 
+      - master
+
+    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+        with:
+          ref: master
+      - name: install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_KEY }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+      - name: compose down
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "cd /home/${{ secrets.SSH_USER }}/server && if [ -f docker-compose.yml ]; then docker-compose down; else echo 'No existe el archivo docker-compose.yml'; fi"
+      - name: rsync
+        run: |
+          sudo apt-get update && sudo apt-get install -y rsync
+          rsync -avz . ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SSH_USER }}/server/
+      - name: secrets
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "echo 'export SERVER_IP=${{ secrets.SERVER_IP }}' >> ~/.bashrc"
+      - name: compose up
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "cd /home/${{ secrets.SSH_USER }}/server && if [ -f docker-compose.yml ]; then docker-compose up --build --detach; else echo 'No existe el archivo docker-compose.yml'; fi"

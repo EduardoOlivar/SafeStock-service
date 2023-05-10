@@ -14,6 +14,7 @@ import sys
 import datetime
 from pathlib import Path
 from datetime import timedelta
+from decouple import config, Csv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,13 +27,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-jmotql6sn-bb9ypdlyr*5ljfko2kk@6g75chg7ql&9o242*8w!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '54.85.156.164',
-    os.environ.get('INTERNAL_IP', '0.0.0.0'),
-]
+DEBUG = config('DEBUG', default=True, cast=bool)
+ALLOWED_HOSTS = config(
+    'ALLOWED_HOSTS',
+    default=['localhost', '127.0.0.1', '0.0.0.0'],
+    cast=Csv()
+)
 AUTH_USER_MODEL = 'api.Users'
 
 
@@ -112,11 +112,11 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': os.environ.get('DB_DATABASE', 'safe_stock'),
-            'USER': os.environ.get('DB_USER', 'root'),
-            'PASSWORD': os.environ.get('DB_PASSWORD', ''),
-            'HOST': os.environ.get('DB_IP', '0.0.0.0'),
-            'PORT': os.environ.get('DB_PORT', '3306')
+            'NAME': config('DB_DATABASE', default='safe_stock'),
+            'USER': config('DB_USER', default='root'),
+            'PASSWORD': config('DB_PASSWORD', default=''),
+            'HOST': config('DB_IP', default='0.0.0.0'),
+            'PORT': config('DB_PORT', default='3306')
         }
     }
 

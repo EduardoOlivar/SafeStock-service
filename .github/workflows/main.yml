@@ -5,7 +5,6 @@ on:
     branches: 
       - master
 
-    
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -21,9 +20,13 @@ jobs:
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
       - name: compose down
         run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "cd /home/${{ secrets.SSH_USER }}/server && if [ -f docker-compose.yml ]; then docker-compose down; else echo 'No existe el archivo docker-compose.yml'; fi"
-      - name: rsync
+      - name: upload files
+        env:
+          ENV_FILE: ${{secrets.ENV_FILE}}
         run: |
+          echo "$ENV_FILE" > .env
           sudo apt-get update && sudo apt-get install -y rsync
           rsync -avz . ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:/home/${{ secrets.SSH_USER }}/server/
+        shell: bash
       - name: compose up
         run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "cd /home/${{ secrets.SSH_USER }}/server && if [ -f docker-compose.yml ]; then docker-compose up --build --detach; else echo 'No existe el archivo docker-compose.yml'; fi"

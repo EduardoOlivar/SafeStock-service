@@ -1,7 +1,10 @@
-django
-djangorestframework
+django~=4.2
+djangorestframework~=3.14.0
 mysqlclient
-django-filter
+django-filter~=23.2
 django-cors-headers
 djangorestframework_simplejwt
 django_rest_passwordreset
+python-decouple
+python-magic;platform_system=="Linux"
+python-magic-bin;platform_system=="Windows"

@@ -44,7 +44,7 @@ class Users(AbstractBaseUser, PermissionsMixin,GenericAttributes):
     image_file = models.FileField(upload_to='user/images/')
     phone_number = models.TextField(**common_args)
     token = models.TextField(**common_args)
-    last_session = models.DateTimeField(**common_args)
+    last_session = models.DateTimeField(**common_args,auto_now_add=True)
     is_validated = models.BooleanField(**common_args,default=False)
     is_staff = models.BooleanField(**common_args,default=False)
     is_admin = models.BooleanField(**common_args, default=False)
@@ -119,20 +119,38 @@ class Debtor(GenericAttributes):
 
 
 class Shop(GenericAttributes):
+    AVAILABLE_SHOP_TYPE = [
+        ('negocio_pequeño', 'Negocio de Barrio'),
+        ('panaderia', 'Panaderia'),
+        ('verduleria', 'Verduleria'),
+        ('carniceria', 'Carniceria'),
+        ('mini_market', 'MiniMarket')
+    ]
     user = models.OneToOneField(Users, on_delete=models.CASCADE, **common_args, related_name='user')
     name = models.TextField(**common_args)
     image_file = models.FileField(upload_to='shop/images/', **common_args)
     city = models.TextField(**common_args)
     commune = models.TextField(**common_args)
     address = models.TextField(**common_args)
-    shop_type = models.TextField(**common_args)
+    shop_type = models.TextField(**common_args, choices=AVAILABLE_SHOP_TYPE, default='negocio_pequeño')
     open_days = models.IntegerField(**common_args)
     opens_at = models.DateTimeField(**common_args)
     close_at = models.TimeField(**common_args)
 
 
 class Category(GenericAttributes):
-    name = models.TextField(**common_args)
+    AVAILABLE_CATEGORY = [
+        ('carnes', 'Carnes'),
+        ('lacteos', 'Lacteos'),
+        ('pan', 'Pan'),
+        ('carniceria', 'Carniceria'),
+        ('panaderia', 'Panaderia'),
+        ('despensa', 'Despensa'), #aqui poner que la despensa es para arroz, fideos, etc
+        ('botilleria', 'Botilleria'),
+        ('frutas_verduras', 'Frutas o Verduras'),
+        ('limpieza', 'Limpieza'),
+    ]
+    category = models.TextField(**common_args, choices=AVAILABLE_CATEGORY, default='despensa')
 
 
 class Item(GenericAttributes):

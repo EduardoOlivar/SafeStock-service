@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from api.models import *
-from backend.settings import TASK_UPLOAD_FILE_TYPES, TASK_UPLOAD_FILE_MAX_SIZE
+from backend.settings import TASK_UPLOAD_FILE_TYPES, TASK_UPLOAD_FILE_MAX_SIZE, TASK_UPLOAD_FILE_EXTENSIONS
 import magic
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -27,10 +27,13 @@ class UserSerializer(serializers.ModelSerializer):
     def validate_image_file(value):
         if value is None:
             return value
+        file_extension = value.name.split('.')[-1].lower()
+        if file_extension not in TASK_UPLOAD_FILE_EXTENSIONS:
+            raise serializers.ValidationError("Extensión de imagen no soportada. Solo se aceptan jpeg, jpg y png")
         magic_file = magic.Magic(mime=True)
         content_type = magic_file.from_buffer(value.read())
         if content_type not in TASK_UPLOAD_FILE_TYPES:
-            raise serializers.ValidationError("Tipo de archivo no soportado. Solo se aceptan jpeg, jpg y png")
+            raise serializers.ValidationError("Tipo de imagen no soportado. Solo se aceptan jpeg, jpg y png")
         if value.size > TASK_UPLOAD_FILE_MAX_SIZE:
             raise serializers.ValidationError(f"El tamaño debe ser menor a {TASK_UPLOAD_FILE_MAX_SIZE} bytes. El tamaño actual es {value.size} bytes")
         return value
@@ -55,10 +58,13 @@ class ShopSerializer(serializers.ModelSerializer):
     def validate_image_file(value):
         if value is None:
             return value
+        file_extension = value.name.split('.')[-1].lower()
+        if file_extension not in TASK_UPLOAD_FILE_EXTENSIONS:
+            raise serializers.ValidationError("Extensión de imagen no soportada. Solo se aceptan jpeg, jpg y png")
         magic_file = magic.Magic(mime=True)
         content_type = magic_file.from_buffer(value.read())
         if content_type not in TASK_UPLOAD_FILE_TYPES:
-            raise serializers.ValidationError("Tipo de archivo no soportado. Solo se aceptan jpeg, jpg y png")
+            raise serializers.ValidationError("Tipo de imagen no soportado. Solo se aceptan jpeg, jpg y png")
         if value.size > TASK_UPLOAD_FILE_MAX_SIZE:
             raise serializers.ValidationError(f"El tamaño debe ser menor a {TASK_UPLOAD_FILE_MAX_SIZE} bytes. El tamaño actual es {value.size} bytes")
         return value

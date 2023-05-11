@@ -115,7 +115,7 @@ else:
             'NAME': config('DB_DATABASE', default='safe_stock'),
             'USER': config('DB_USER', default='root'),
             'PASSWORD': config('DB_PASSWORD', default=''),
-            'HOST': config('DB_IP', default='0.0.0.0'),
+            'HOST': config('DB_IP', default='localhost'),
             'PORT': config('DB_PORT', default='3306')
         }
     }
@@ -164,6 +164,7 @@ FIXTURE_DIRS = (os.path.join(BASE_DIR, 'fixtures'),)
 
 # Media files
 TASK_UPLOAD_FILE_TYPES = ['image/jpeg','image/jpg','image/png']
+TASK_UPLOAD_FILE_EXTENSIONS = ['jpg', 'jpeg', 'png']
 TASK_UPLOAD_FILE_MAX_SIZE = 25 *1024 * 1024
 # Max memory file upload
 FILE_UPLOAD_MAX_MEMORY_SIZE = 30 *1024 * 1024

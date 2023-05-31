@@ -50,12 +50,13 @@ class UsersDetail(generics.RetrieveUpdateAPIView):
 
 class UserProfileView(APIView):
     renderer_classes = [UserRenderer, ]
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
-        serializer = UserProfileSerializer(request.user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        user = request.user  # Obtener el usuario autenticado
 
+        serializer = ProfileUserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class SignUpView(APIView):
     def post(self, request):
@@ -210,18 +211,6 @@ class SupplierDetail(generics.RetrieveUpdateAPIView):
     #permission_classes = (IsAuthenticated,)
 
 
-class UserSuppliersCreate(generics.CreateAPIView):
-    queryset = UserSuppliers.objects.filter(is_deleted=False).order_by('pk')
-    serializer_class = UserSuppliersSerializer
-    #permission_classes = (IsAuthenticated,)
-
-
-class UserSuppliersDetail(generics.RetrieveUpdateAPIView):
-    queryset = UserSuppliers.objects.filter(is_deleted=False).order_by('pk')
-    serializer_class = UserSuppliersSerializer
-    #permission_classes = (IsAuthenticated,)
-
-
 class DebtorListCreate(generics.ListCreateAPIView):
     queryset = Debtor.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = DebtorSerializer
@@ -257,17 +246,17 @@ class ItemDetail(generics.RetrieveUpdateAPIView):
     serializer_class = ItemSerializer
     #permission_classes = (IsAuthenticated,)
 
-
-class ShopItemsListCreate(generics.ListCreateAPIView):
-    queryset = ShopItems.objects.filter(is_deleted=False).order_by('pk')
-    serializer_class = ShopItemsSerializer
-    #permission_classes = (IsAuthenticated,)
-
-
-class ShopItemsDetail(generics.RetrieveUpdateAPIView):
-    queryset = ShopItems.objects.filter(is_deleted=False).order_by('pk')
-    serializer_class = ShopItemsSerializer
-    #permission_classes = (IsAuthenticated,)
+#
+# class ShopItemsListCreate(generics.ListCreateAPIView):
+#     queryset = ShopItems.objects.filter(is_deleted=False).order_by('pk')
+#     serializer_class = ShopItemsSerializer
+#     #permission_classes = (IsAuthenticated,)
+#
+#
+# class ShopItemsDetail(generics.RetrieveUpdateAPIView):
+#     queryset = ShopItems.objects.filter(is_deleted=False).order_by('pk')
+#     serializer_class = ShopItemsSerializer
+#     #permission_classes = (IsAuthenticated,)
 
 
 class UserDebtorItemsListCreate(generics.ListCreateAPIView):
@@ -279,4 +268,32 @@ class UserDebtorItemsListCreate(generics.ListCreateAPIView):
 class UserDebtorItemsDetail(generics.RetrieveUpdateAPIView):
     queryset = UserDebtorItems.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = UserDebtorItemsSerializer
+    #permission_classes = (IsAuthenticated,)
+
+
+class SupplierRemoveListView(generics.RetrieveUpdateAPIView):
+    queryset = Supplier.objects.filter(is_deleted=False)
+    serializer_class = DeleteSupplierSerializer
+    # permission_classes = (IsAuthenticated,)
+
+
+class RemoveUserFinanceView(generics.RetrieveUpdateAPIView):
+    queryset = UserFinances.objects.filter(is_deleted=False)
+    serializer_class = DeleteUserFinanceSerializer
+    #permission_classes = (IsAuthenticated,)
+
+
+class ShopListView(generics.ListAPIView):
+    queryset = Shop.objects.filter(is_deleted=False)
+    serializer_class = ShopListSerializer
+
+
+class ShopDetailView(generics.RetrieveAPIView):
+    queryset = Shop.objects.filter(is_deleted=False)
+    serializer_class = ShopProfileSerializer
+
+
+class RemoveItemView(generics.RetrieveUpdateAPIView):
+    queryset = Item.objects.filter(is_deleted=False)
+    serializer_class = RemoveItemSerializer
     #permission_classes = (IsAuthenticated,)

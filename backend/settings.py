@@ -28,11 +28,11 @@ SECRET_KEY = 'django-insecure-jmotql6sn-bb9ypdlyr*5ljfko2kk@6g75chg7ql&9o242*8w!
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
-ALLOWED_HOSTS = config(
-    'ALLOWED_HOSTS',
-    default=['localhost', '127.0.0.1', '0.0.0.0'],
-    cast=Csv()
-)
+# ALLOWED_HOSTS = config(
+#     'ALLOWED_HOSTS',
+#     default=['localhost', '127.0.0.1', '0.0.0.0'],
+#     cast=Csv()
+# )
 AUTH_USER_MODEL = 'api.Users'
 
 
@@ -73,7 +73,7 @@ SIMPLE_JWT = {
     'SIGNING_KEY': SECRET_KEY,
     'UPDATE_LAST_LOGIN': True,
     'AUTH_HEADER_TYPES': ('Bearer',),
-    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=7),
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=20),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7)
 }
 

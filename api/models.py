@@ -88,16 +88,19 @@ class UserNotification(GenericAttributes):
 
 
 class Finance(GenericAttributes):
-    user = models.OneToOneField(Users, on_delete=models.CASCADE, **common_args, related_name='finance')
     users_finance = models.ManyToManyField(Users, blank=True, through='UserFinances', related_name='financesusers')
     period = models.IntegerField(**common_args) #atributo para que el usuario elija cada cuanto tiempo quiere las notificaciones de su finanzas
     max_spend = models.IntegerField(**common_args, default=0)
 
 
 class UserFinances(GenericAttributes):
+    AVAILABLE_FINANCE_TYPE = [
+        ('profit', 'Ganancia'),
+        ('cost', 'Gasto')
+    ]
     finances = models.ForeignKey(Finance, on_delete=models.CASCADE, **common_args, related_name='userfinances')
     users = models.ForeignKey(Users, on_delete=models.CASCADE, **common_args, related_name='userfinances')
-    type = models.TextField(**common_args)
+    type = models.TextField(**common_args, choices=AVAILABLE_FINANCE_TYPE, default='profit')
     details = models.TextField(**common_args)
     total = models.FloatField(**common_args)
 
@@ -106,11 +109,7 @@ class Supplier(GenericAttributes):
     name = models.TextField(**common_args)
     phone_number = models.TextField(**common_args)
     details = models.TextField(**common_args)
-
-
-class UserSuppliers(GenericAttributes):
-    supplier = models.OneToOneField(Supplier, on_delete=models.CASCADE, **common_args, related_name='usersuppliers')
-    users = models.ForeignKey(Users, on_delete=models.CASCADE, **common_args, related_name='usersuppliers')
+    user = models.ForeignKey(Users, **common_args,on_delete=models.CASCADE, related_name='supplier')
 
 
 class Debtor(GenericAttributes):
@@ -126,7 +125,7 @@ class Shop(GenericAttributes):
         ('carniceria', 'Carniceria'),
         ('mini_market', 'MiniMarket')
     ]
-    user = models.OneToOneField(Users, on_delete=models.CASCADE, **common_args, related_name='user')
+    user = models.OneToOneField(Users, on_delete=models.CASCADE, **common_args, related_name='shop')
     name = models.TextField(**common_args)
     image_file = models.FileField(upload_to='shop/images/', **common_args)
     city = models.TextField(**common_args)
@@ -134,7 +133,7 @@ class Shop(GenericAttributes):
     address = models.TextField(**common_args)
     shop_type = models.TextField(**common_args, choices=AVAILABLE_SHOP_TYPE, default='negocio_pequeño')
     open_days = models.IntegerField(**common_args)
-    opens_at = models.DateTimeField(**common_args)
+    opens_at = models.TimeField(**common_args)
     close_at = models.TimeField(**common_args)
 
 
@@ -161,11 +160,7 @@ class Item(GenericAttributes):
     details = models.TextField(**common_args)
     quantity = models.FloatField(**common_args)
     weight = models.FloatField(**common_args)
-
-
-class ShopItems(GenericAttributes):
-    shops = models.ForeignKey(Shop, on_delete=models.CASCADE, **common_args, related_name='shopitems')
-    item = models.OneToOneField(Item, on_delete=models.CASCADE, **common_args, related_name='shopitems')
+    shop = models.ForeignKey(Shop, **common_args, on_delete=models.CASCADE, related_name='items')
 
 
 class UserDebtorItems(GenericAttributes):

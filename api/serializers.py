@@ -37,7 +37,6 @@ class UserSerializer(serializers.ModelSerializer):
         if value.size > TASK_UPLOAD_FILE_MAX_SIZE:
             raise serializers.ValidationError(f"El tamaño debe ser menor a {TASK_UPLOAD_FILE_MAX_SIZE} bytes. El tamaño actual es {value.size} bytes")
         return value
-    # ['image/jpeg','image/jpg','image/png']
 
 
 class UserLoginSerializer(serializers.ModelSerializer):
@@ -52,7 +51,7 @@ class ShopSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Shop
-        exclude = [*generic_fields, "user"]
+        exclude = [*generic_fields]
 
     @staticmethod
     def validate_image_file(value):
@@ -68,18 +67,19 @@ class ShopSerializer(serializers.ModelSerializer):
         if value.size > TASK_UPLOAD_FILE_MAX_SIZE:
             raise serializers.ValidationError(f"El tamaño debe ser menor a {TASK_UPLOAD_FILE_MAX_SIZE} bytes. El tamaño actual es {value.size} bytes")
         return value
-    # ['image/jpeg','image/jpg','image/png']
 
 
-class ShopReplaceSerializer(ShopSerializer):
+class ProfileUserSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Shop
-        fields = ['address', 'name']
+        model = Users
+        fields = ['username', 'phone_number', 'image_file']
 
-
-class UserProfileSerializer(UserSerializer):
-    shop = ShopReplaceSerializer()
+    def to_representation(self, instance: Users):
+        data = super().to_representation(instance)
+        data['name_shop'] = instance.shop.name
+        data['address_shop'] = instance.shop.address
+        return data
 
 
 #serializador para registrarse
@@ -202,34 +202,27 @@ class UserNotificationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserNotification
-        exclude = [*generic_fields, 'users']
+        exclude = [*generic_fields]
 
 
 class FinanceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Finance
-        exclude = [*generic_fields, 'user']
+        exclude = [*generic_fields]
 
 
 class UserFinancesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserFinances
-        exclude = [*generic_fields, 'users', 'finances']
+        exclude = [*generic_fields]
 
 
 class SupplierSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Supplier
-        exclude = [*generic_fields]
-
-
-class UserSuppliersSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = UserSuppliers
         exclude = [*generic_fields]
 
 
@@ -248,21 +241,80 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class ItemSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Item
-        exclude = [*generic_fields, 'categories']
-
-
-class ShopItemsSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = ShopItems
         exclude = [*generic_fields]
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['category'] = instance.categories.category
+        return data
+
+# class ShopItemsSerializer(serializers.ModelSerializer):
+#
+#     class Meta:
+#         model = ShopItems
+#         exclude = [*generic_fields]
 
 
 class UserDebtorItemsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserDebtorItems
-        exclude = [*generic_fields, 'users', 'debtors', 'items']
+        exclude = [*generic_fields]
+
+
+class DeleteSupplierSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Supplier
+        exclude = [*generic_fields]
+
+    def update(self, instance, validated_data):
+        instance.is_deleted = True
+        instance.save()
+        return instance
+
+
+class DeleteUserFinanceSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UserFinances
+        exclude = [*generic_fields]
+
+    def update(self, instance, validated_data):
+        instance.is_deleted = True
+        instance.save()
+        return instance
+
+
+class ShopListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Shop
+        fields = ['name','image_file', 'address']
+
+
+class ShopProfileSerializer(serializers.ModelSerializer):
+    items = ItemSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = Shop
+        fields = ['name', 'image_file', 'address', 'open_days', 'opens_at', 'close_at', 'items']
+
+    def to_representation(self, instance: Shop):
+        data = super().to_representation(instance)
+        data['username'] = instance.user.username
+        data['phone_number'] = instance.user.phone_number
+        return data
+
+
+class RemoveItemSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Item
+        exclude = [*generic_fields]
+
+    def update(self, instance, validated_data):
+        instance.is_deleted = True
+        instance.save()
+        return instance

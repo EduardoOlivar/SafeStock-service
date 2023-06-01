@@ -245,10 +245,10 @@ class ItemSerializer(serializers.ModelSerializer):
         model = Item
         exclude = [*generic_fields]
 
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        data['category'] = instance.categories.category
-        return data
+    # def to_representation(self, instance):
+    #     data = super().to_representation(instance)
+    #     data['category'] = instance.categories.category
+    #     return data
 
 # class ShopItemsSerializer(serializers.ModelSerializer):
 #
@@ -264,7 +264,7 @@ class UserDebtorItemsSerializer(serializers.ModelSerializer):
         exclude = [*generic_fields]
 
 
-class DeleteSupplierSerializer(serializers.ModelSerializer):
+class RemoveSupplierSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Supplier
@@ -276,7 +276,7 @@ class DeleteSupplierSerializer(serializers.ModelSerializer):
         return instance
 
 
-class DeleteUserFinanceSerializer(serializers.ModelSerializer):
+class RemoveUserFinanceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserFinances
@@ -291,7 +291,7 @@ class DeleteUserFinanceSerializer(serializers.ModelSerializer):
 class ShopListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shop
-        fields = ['name','image_file', 'address']
+        fields = ['name', 'image_file', 'address']
 
 
 class ShopProfileSerializer(serializers.ModelSerializer):

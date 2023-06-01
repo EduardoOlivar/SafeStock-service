@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from api.models import *
-from backend.settings import TASK_UPLOAD_FILE_TYPES, TASK_UPLOAD_FILE_MAX_SIZE
+from backend.settings import TASK_UPLOAD_FILE_TYPES, TASK_UPLOAD_FILE_MAX_SIZE, TASK_UPLOAD_FILE_EXTENSIONS
 import magic
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -27,14 +27,16 @@ class UserSerializer(serializers.ModelSerializer):
     def validate_image_file(value):
         if value is None:
             return value
+        file_extension = value.name.split('.')[-1].lower()
+        if file_extension not in TASK_UPLOAD_FILE_EXTENSIONS:
+            raise serializers.ValidationError("Extensión de imagen no soportada. Solo se aceptan jpeg, jpg y png")
         magic_file = magic.Magic(mime=True)
         content_type = magic_file.from_buffer(value.read())
         if content_type not in TASK_UPLOAD_FILE_TYPES:
-            raise serializers.ValidationError("Tipo de archivo no soportado. Solo se aceptan jpeg, jpg y png")
+            raise serializers.ValidationError("Tipo de imagen no soportado. Solo se aceptan jpeg, jpg y png")
         if value.size > TASK_UPLOAD_FILE_MAX_SIZE:
             raise serializers.ValidationError(f"El tamaño debe ser menor a {TASK_UPLOAD_FILE_MAX_SIZE} bytes. El tamaño actual es {value.size} bytes")
         return value
-    # ['image/jpeg','image/jpg','image/png']
 
 
 class UserLoginSerializer(serializers.ModelSerializer):
@@ -49,31 +51,35 @@ class ShopSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Shop
-        exclude = [*generic_fields, "user"]
+        exclude = [*generic_fields]
 
     @staticmethod
     def validate_image_file(value):
         if value is None:
             return value
+        file_extension = value.name.split('.')[-1].lower()
+        if file_extension not in TASK_UPLOAD_FILE_EXTENSIONS:
+            raise serializers.ValidationError("Extensión de imagen no soportada. Solo se aceptan jpeg, jpg y png")
         magic_file = magic.Magic(mime=True)
         content_type = magic_file.from_buffer(value.read())
         if content_type not in TASK_UPLOAD_FILE_TYPES:
-            raise serializers.ValidationError("Tipo de archivo no soportado. Solo se aceptan jpeg, jpg y png")
+            raise serializers.ValidationError("Tipo de imagen no soportado. Solo se aceptan jpeg, jpg y png")
         if value.size > TASK_UPLOAD_FILE_MAX_SIZE:
             raise serializers.ValidationError(f"El tamaño debe ser menor a {TASK_UPLOAD_FILE_MAX_SIZE} bytes. El tamaño actual es {value.size} bytes")
         return value
-    # ['image/jpeg','image/jpg','image/png']
 
 
-class ShopReplaceSerializer(ShopSerializer):
+class ProfileUserSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Shop
-        fields = ['address', 'name']
+        model = Users
+        fields = ['username', 'phone_number', 'image_file']
 
-
-class UserProfileSerializer(UserSerializer):
-    shop = ShopReplaceSerializer()
+    def to_representation(self, instance: Users):
+        data = super().to_representation(instance)
+        data['name_shop'] = instance.shop.name
+        data['address_shop'] = instance.shop.address
+        return data
 
 
 #serializador para registrarse
@@ -196,34 +202,27 @@ class UserNotificationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserNotification
-        exclude = [*generic_fields, 'users']
+        exclude = [*generic_fields]
 
 
 class FinanceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Finance
-        exclude = [*generic_fields, 'user']
+        exclude = [*generic_fields]
 
 
 class UserFinancesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserFinances
-        exclude = [*generic_fields, 'users', 'finances']
+        exclude = [*generic_fields]
 
 
 class SupplierSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Supplier
-        exclude = [*generic_fields]
-
-
-class UserSuppliersSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = UserSuppliers
         exclude = [*generic_fields]
 
 
@@ -242,21 +241,80 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class ItemSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Item
-        exclude = [*generic_fields, 'categories']
-
-
-class ShopItemsSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = ShopItems
         exclude = [*generic_fields]
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['category'] = instance.categories.category
+        return data
+
+# class ShopItemsSerializer(serializers.ModelSerializer):
+#
+#     class Meta:
+#         model = ShopItems
+#         exclude = [*generic_fields]
 
 
 class UserDebtorItemsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserDebtorItems
-        exclude = [*generic_fields, 'users', 'debtors', 'items']
+        exclude = [*generic_fields]
+
+
+class DeleteSupplierSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Supplier
+        exclude = [*generic_fields]
+
+    def update(self, instance, validated_data):
+        instance.is_deleted = True
+        instance.save()
+        return instance
+
+
+class DeleteUserFinanceSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UserFinances
+        exclude = [*generic_fields]
+
+    def update(self, instance, validated_data):
+        instance.is_deleted = True
+        instance.save()
+        return instance
+
+
+class ShopListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Shop
+        fields = ['name','image_file', 'address']
+
+
+class ShopProfileSerializer(serializers.ModelSerializer):
+    items = ItemSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = Shop
+        fields = ['name', 'image_file', 'address', 'open_days', 'opens_at', 'close_at', 'items']
+
+    def to_representation(self, instance: Shop):
+        data = super().to_representation(instance)
+        data['username'] = instance.user.username
+        data['phone_number'] = instance.user.phone_number
+        return data
+
+
+class RemoveItemSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Item
+        exclude = [*generic_fields]
+
+    def update(self, instance, validated_data):
+        instance.is_deleted = True
+        instance.save()
+        return instance

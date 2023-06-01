@@ -73,7 +73,7 @@ SIMPLE_JWT = {
     'SIGNING_KEY': SECRET_KEY,
     'UPDATE_LAST_LOGIN': True,
     'AUTH_HEADER_TYPES': ('Bearer',),
-    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=7),
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=20),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7)
 }
 
@@ -115,7 +115,7 @@ else:
             'NAME': config('DB_DATABASE', default='safe_stock'),
             'USER': config('DB_USER', default='root'),
             'PASSWORD': config('DB_PASSWORD', default=''),
-            'HOST': config('DB_IP', default='0.0.0.0'),
+            'HOST': config('DB_IP', default='localhost'),
             'PORT': config('DB_PORT', default='3306')
         }
     }
@@ -164,6 +164,7 @@ FIXTURE_DIRS = (os.path.join(BASE_DIR, 'fixtures'),)
 
 # Media files
 TASK_UPLOAD_FILE_TYPES = ['image/jpeg','image/jpg','image/png']
+TASK_UPLOAD_FILE_EXTENSIONS = ['jpg', 'jpeg', 'png']
 TASK_UPLOAD_FILE_MAX_SIZE = 25 *1024 * 1024
 # Max memory file upload
 FILE_UPLOAD_MAX_MEMORY_SIZE = 30 *1024 * 1024
@@ -186,6 +187,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'safestock.app@gmail.com'
-EMAIL_HOST_PASSWORD = ''
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 EMAIL_USE_TLS = True

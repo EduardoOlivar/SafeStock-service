@@ -1,3 +1,5 @@
+from rest_framework.filters import SearchFilter
+
 from api.serializers import *
 from rest_framework import generics
 from rest_framework.views import APIView
@@ -11,7 +13,7 @@ from rest_framework.response import Response
 from api.models import *
 from rest_framework.permissions import IsAuthenticated
 from django.db import connections
-
+from django.db.models import Q
 
 # Create your views here.
 
@@ -190,7 +192,22 @@ class FinancesDetail(generics.RetrieveUpdateAPIView):
 class UserFinancesListCreate(generics.ListCreateAPIView):
     queryset = UserFinances.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = UserFinancesSerializer
-    #permission_classes = (IsAuthenticated,)
+    filter_backends = [SearchFilter]
+    search_fields = ['type', 'total']
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        finance_type = self.request.query_params.get('finance_type', None)
+        total_min = self.request.query_params.get('total_min', None)
+        total_max = self.request.query_params.get('total_max', None)
+        if finance_type:
+            queryset = queryset.filter(type=finance_type)
+        if total_min:
+            queryset = queryset.filter(total__gte=total_min)
+        if total_max:
+            queryset = queryset.filter(total__lte=total_max)
+        return queryset
 
 
 class UserFinancesDetail(generics.RetrieveUpdateAPIView):
@@ -202,7 +219,16 @@ class UserFinancesDetail(generics.RetrieveUpdateAPIView):
 class SupplierListCreate(generics.ListCreateAPIView):
     queryset = Supplier.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = SupplierSerializer
-    #permission_classes = (IsAuthenticated,)
+    filter_backends = [SearchFilter]
+    search_fields = ['name']
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        search_query = self.request.query_params.get('search', None)
+        if search_query:
+            queryset = queryset.filter(name__icontains=search_query)
+        return queryset
 
 
 class SupplierDetail(generics.RetrieveUpdateAPIView):
@@ -214,6 +240,8 @@ class SupplierDetail(generics.RetrieveUpdateAPIView):
 class DebtorListCreate(generics.ListCreateAPIView):
     queryset = Debtor.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = DebtorSerializer
+    filter_backends = [SearchFilter]
+    search_fields = ['name']
     #permission_classes = (IsAuthenticated,)
 
 
@@ -238,6 +266,8 @@ class CategoryDetail(generics.RetrieveUpdateAPIView):
 class ItemListCreate(generics.ListCreateAPIView):
     queryset = Item.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = ItemSerializer
+    filter_backends = [SearchFilter]
+    search_fields = ['name', 'buy_price', 'sell_price']
     #permission_classes = (IsAuthenticated,)
 
 
@@ -273,19 +303,28 @@ class UserDebtorItemsDetail(generics.RetrieveUpdateAPIView):
 
 class SupplierRemoveListView(generics.RetrieveUpdateAPIView):
     queryset = Supplier.objects.filter(is_deleted=False)
-    serializer_class = DeleteSupplierSerializer
+    serializer_class = RemoveSupplierSerializer
     # permission_classes = (IsAuthenticated,)
 
 
 class RemoveUserFinanceView(generics.RetrieveUpdateAPIView):
     queryset = UserFinances.objects.filter(is_deleted=False)
-    serializer_class = DeleteUserFinanceSerializer
+    serializer_class = RemoveUserFinanceSerializer
     #permission_classes = (IsAuthenticated,)
 
 
 class ShopListView(generics.ListAPIView):
-    queryset = Shop.objects.filter(is_deleted=False)
     serializer_class = ShopListSerializer
+
+    def get_queryset(self):
+        queryset = Shop.objects.filter(is_deleted=False)
+        search_query = self.request.query_params.get('search', None)
+        if search_query:
+            queryset = queryset.filter(
+                Q(name__icontains=search_query) |
+                Q(address__icontains=search_query)
+            )
+        return queryset
 
 
 class ShopDetailView(generics.RetrieveAPIView):

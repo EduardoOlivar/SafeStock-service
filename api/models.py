@@ -155,12 +155,11 @@ class Category(GenericAttributes):
 class Item(GenericAttributes):
     categories_id = models.ForeignKey(Category, on_delete=models.CASCADE, **common_args, related_name='item')
     name = models.TextField(**common_args)
-    buy_price = models.IntegerField(**common_args, default= 0)
-    sell_price = models.IntegerField(**common_args, default= 0)
+    buy_price = models.IntegerField(**common_args, default=0)
+    sell_price = models.IntegerField(**common_args, default=0)
     details = models.TextField(**common_args)
-    quantity = models.IntegerField(**common_args, default= 0) # la catidad sera por unidad
-    weight = models.IntegerField(**common_args, default= 0) # peso se medira en gramos
-    sold = models.IntegerField(**common_args, default= 0) # atributo para tener un registro de la venta
+    quantity = models.IntegerField(**common_args, default=0) # la catidad sera por unidad
+    weight = models.IntegerField(**common_args, default=0) # peso se medira en gramos
     shop = models.ManyToManyField(Shop, blank=True, through='ShopItems')
 
 

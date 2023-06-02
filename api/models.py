@@ -38,6 +38,7 @@ class UserManager(BaseUserManager):
         return user
 
 
+#tabla de usuario
 class Users(AbstractBaseUser, PermissionsMixin,GenericAttributes):
     email = models.EmailField(max_length=255, unique=True, **common_args)
     username = models.TextField(**common_args)
@@ -63,18 +64,21 @@ class Users(AbstractBaseUser, PermissionsMixin,GenericAttributes):
         return self.is_staff
 
 
+#tabla para activar desactivar reportes
 class ReportSettings(GenericAttributes):
     user_id = models.ForeignKey(Users, on_delete=models.CASCADE, **common_args)
     is_enabled = models.BooleanField(default=False)
     period = models.IntegerField(**common_args) #atributo para que el usuario elija cada cuanto tiempo quiere el reporte
 
 
+#tabla de recomendaciones
 class Recommendations(GenericAttributes):
     user_id = models.ForeignKey(Users, on_delete=models.CASCADE, **common_args)
     is_enabled = models.BooleanField(default=False)
     period = models.IntegerField(**common_args) #atributo para que el usuario elija cada cuanto tiempo quiere las recomendaciones
 
 
+#tabla de notificaciones a los usuarios
 class Notification(GenericAttributes):
     user_id = models.ManyToManyField(Users, blank=True, through='UserNotification', related_name='notification')
     is_enabled = models.BooleanField(default=False)
@@ -87,12 +91,14 @@ class UserNotification(GenericAttributes):
     details = models.TextField(**common_args)
 
 
+#tabla de finanzas
 class Finance(GenericAttributes):
     users_finance_id = models.ManyToManyField(Users, blank=True, through='UserFinances', related_name='financesusers')
     period = models.IntegerField(**common_args) #atributo para que el usuario elija cada cuanto tiempo quiere las notificaciones de su finanzas
     max_spend = models.IntegerField(**common_args, default=0)
 
 
+#tabla para el registro si es una ganancia o es un gasto
 class UserFinances(GenericAttributes):
     AVAILABLE_FINANCE_TYPE = [
         ('profit', 'Ganancia'),
@@ -105,6 +111,7 @@ class UserFinances(GenericAttributes):
     total = models.FloatField(**common_args)
 
 
+#tabla para el proveedor
 class Supplier(GenericAttributes):
     name = models.TextField(**common_args)
     phone_number = models.TextField(**common_args)
@@ -112,12 +119,14 @@ class Supplier(GenericAttributes):
     user_id = models.ForeignKey(Users, **common_args,on_delete=models.CASCADE, related_name='supplier')
 
 
+#tabla para el fiado
 class Debtor(GenericAttributes):
     name = models.TextField(**common_args)
     details = models.TextField(**common_args)
     user_id = models.ManyToManyField(Users, blank=True, through='UserDebtorItems')
 
 
+#tabla del negocio
 class Shop(GenericAttributes):
     AVAILABLE_SHOP_TYPE = [
         ('negocio_pequeño', 'Negocio de Barrio'),
@@ -138,6 +147,7 @@ class Shop(GenericAttributes):
     close_at = models.TimeField(**common_args)
 
 
+#categorias que se mostraran de forma automatica para los productos
 class Category(GenericAttributes):
     AVAILABLE_CATEGORY = [
         ('lacteos', 'Lacteos'),
@@ -147,11 +157,12 @@ class Category(GenericAttributes):
         ('botilleria', 'Botilleria'),
         ('frutas_verduras', 'Frutas o Verduras'),
         ('limpieza', 'Limpieza'),
-        ('mascota', 'Mascotas')
+        ('mascotas', 'Mascotas')
     ]
     category = models.TextField(**common_args, choices=AVAILABLE_CATEGORY, default='despensa')
 
 
+#tabla para los productos del negocio
 class Item(GenericAttributes):
     categories_id = models.ForeignKey(Category, on_delete=models.CASCADE, **common_args, related_name='item')
     name = models.TextField(**common_args)
@@ -163,22 +174,24 @@ class Item(GenericAttributes):
     shop = models.ManyToManyField(Shop, blank=True, through='ShopItems')
 
 
+#tabla para suponer una venta y poder tener registro de lo que se "vendio"
 class ShopItems(GenericAttributes):
     shop_id = models.ForeignKey(Shop, on_delete=models.CASCADE, **common_args, related_name='shopitems')
     item_id = models.OneToOneField(Item, on_delete=models.CASCADE, **common_args, related_name='shopitems')
-    sold = models.IntegerField(**common_args, default=0)  # atributo para tener un registro de la venta
-    quantity = models.IntegerField(**common_args, default=0) # la catidad sera por unidad
-    weight = models.IntegerField(**common_args, default=0) # peso se medira en gramos
+    total_sold = models.IntegerField(**common_args, default=0)  # atributo para tener un registro de la venta
+    quantity_sold = models.IntegerField(**common_args, default=0) # la catidad sera por unidad
+    weight_sold = models.IntegerField(**common_args, default=0) # peso se medira en gramos
     date = models.DateTimeField(**common_args, auto_now=True)
 
 
+#tabla para guardar el registro de los items que el usuario fio
 class UserDebtorItems(GenericAttributes):
     debtors_id = models.ForeignKey(Debtor, on_delete=models.CASCADE, **common_args, related_name='interdebtors')
     user_id = models.ForeignKey(Users, on_delete=models.CASCADE, **common_args, related_name='interusers')
     items_id = models.ForeignKey(Item, on_delete=models.CASCADE, **common_args, related_name='interitems')
-    quantity = models.FloatField(**common_args)
-    weight = models.FloatField(**common_args)
-    total = models.FloatField(**common_args)
+    quantity_debtor = models.FloatField(**common_args)
+    weight_debtor = models.FloatField(**common_args)
+    total_debtor = models.FloatField(**common_args)
     is_paid = models.BooleanField(default=False)
 
 

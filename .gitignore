@@ -1,6 +1,6 @@
 venv/
 uploads
-script
+Scripts
 ~$*
 __pycache__/
 \_*.sh

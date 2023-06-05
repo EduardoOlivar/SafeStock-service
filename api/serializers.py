@@ -95,7 +95,7 @@ class SignupSerializer(serializers.ModelSerializer):
         }
 
     def save(self): #metodo para comprobar y guardar lo que el usuario esta rellenando
-        user = Users(email=self.validated_data['email'], username=self.validated_data['username'])
+        user = Users(email=self.validated_data['email'])
         password = self.validated_data['password']
         password2 = self.validated_data['password2']
         if password != password2: #verifica que las password coincidan

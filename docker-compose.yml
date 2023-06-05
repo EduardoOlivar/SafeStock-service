@@ -41,6 +41,17 @@ services:
     networks:
       nw:
         ipv4_address: 172.28.1.1
+  nginx:
+    image: nginx:latest
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - django
+    networks:
+      - nw
 
 volumes:
   mysql_data:

@@ -89,13 +89,13 @@ class SignupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Users
-        fields = ['email', 'username', 'password', 'password2'] #datos que se pediran
+        fields = ['email', 'password', 'password2'] #datos que se pediran
         extra_kwargs = {
             'password': {'write_only': True}
         }
 
     def save(self): #metodo para comprobar y guardar lo que el usuario esta rellenando
-        user = Users(email=self.validated_data['email'], username=self.validated_data['username'])
+        user = Users(email=self.validated_data['email'])
         password = self.validated_data['password']
         password2 = self.validated_data['password2']
         if password != password2: #verifica que las password coincidan

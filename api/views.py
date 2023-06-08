@@ -100,6 +100,12 @@ class LoginView(APIView):
             return Response({'errors': {'error_de_campo': ['Email o contraseña invalidos']}},
                             status=status.HTTP_404_NOT_FOUND)
 
+class LogoutView(APIView):
+
+    def post(self, request):
+        logout(request)  # Cierra la sesión del usuario
+        return Response({'msg': 'Se cerro la sesión con éxito'},
+                        status=status.HTTP_200_OK)  # Retorna un mensaje de éxito en la respuesta
 
 class SendPasswordResetEmailView(APIView):
     renderer_classes = [UserRenderer]
@@ -149,7 +155,6 @@ class ReportSettingDetail(generics.RetrieveUpdateAPIView):
 class RecommendationsList(generics.ListAPIView):
     queryset = Recommendations.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = RecommendationsSerializer
-
     #permission_classes = (IsAuthenticated,)
 
 
@@ -328,6 +333,7 @@ class RemoveUserFinanceView(generics.RetrieveUpdateAPIView):
 # View para listar tiendas con capacidad de búsqueda.
 class ShopListView(generics.ListAPIView):
     serializer_class = ShopListSerializer
+    #permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         queryset = Shop.objects.filter(is_deleted=False) #Obtiene todas las tiendas que no han sido eliminadas.
@@ -346,7 +352,7 @@ class ShopListView(generics.ListAPIView):
 class ShopDetailView(generics.RetrieveAPIView):
     queryset = Shop.objects.filter(is_deleted=False)
     serializer_class = ShopProfileSerializer
-
+    #permission_classes = (IsAuthenticated,)
 
 # View para eliminado logico.
 class RemoveItemView(generics.RetrieveUpdateAPIView):

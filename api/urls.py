@@ -93,6 +93,9 @@ urlpatterns += [
     # Endpoint para iniciar sesión
     re_path(r'^api/login/$', views.LoginView.as_view()),
 
+    #Endpoint para cerrar sesión
+    re_path('api/logout/', views.LogoutView.as_view(), name='logout'),
+
     # Endpoint para enviar correo electrónico de restablecimiento de contraseña
     re_path(r'^api/send_reset_password_email/$', views.SendPasswordResetEmailView.as_view(), name='send_reset_password_email'),
 

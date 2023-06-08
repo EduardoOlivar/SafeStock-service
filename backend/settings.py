@@ -170,11 +170,11 @@ TASK_UPLOAD_FILE_MAX_SIZE = 25 *1024 * 1024
 # Max memory file upload
 FILE_UPLOAD_MAX_MEMORY_SIZE = 30 *1024 * 1024
 
-
 # CORS acepta cualquier origen en las peticiones
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:*',
 ]
+CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

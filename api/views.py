@@ -60,13 +60,27 @@ class UserProfileView(APIView):
         serializer = ProfileUserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-class SignUpView(APIView):
+
+class SignupView(APIView):
     def post(self, request):
         serializer = SignupSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            user = serializer.save()
+            return Response({'user_id': user.pk}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ValidateAccountView(APIView):
+    def post(self, request, pk):
+        token = request.data.get('token')
+        user = get_object_or_404(Users, pk=pk)
+
+        if default_token_generator.check_token(user, token):
+            user.is_validated = True
+            user.save()
+            return Response({'detail': 'La cuenta ha sido validada exitosamente.'})
+
+        return Response({'detail': 'El token de validación es inválido.'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ChangePasswordView(APIView):
@@ -91,7 +105,6 @@ class LoginView(APIView):
         email = serializer.data.get('email')
         password = serializer.data.get('password')
         user = authenticate(email=email, password=password)
-        print(user)
         if user is not None:
             token = get_tokens_for_user(user)
             return Response({'token': token, 'msg': 'Inicio de sesión exitoso'},

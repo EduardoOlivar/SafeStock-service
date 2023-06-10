@@ -88,7 +88,10 @@ urlpatterns += [
     re_path(r'^user/profile/$', views.UserProfileView.as_view()),
 
     # Endpoint para registrarse
-    re_path(r'^api/sign_up/$', views.SignUpView.as_view()),
+    re_path(r'^api/sign_up/$', views.SignupView.as_view()),
+
+    # Endpoint para validacion del registro
+    re_path(r'^api/user/(?P<pk>[0-9]+)/validate/$', views.ValidateAccountView.as_view()),
 
     # Endpoint para iniciar sesión
     re_path(r'^api/login/$', views.LoginView.as_view()),

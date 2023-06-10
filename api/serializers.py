@@ -3,7 +3,7 @@ from api.models import *
 from backend.settings import TASK_UPLOAD_FILE_TYPES, TASK_UPLOAD_FILE_MAX_SIZE, TASK_UPLOAD_FILE_EXTENSIONS
 import magic
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.contrib.auth.tokens import PasswordResetTokenGenerator, default_token_generator
 from backend.settings import EMAIL_HOST_USER
 from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail, get_connection
@@ -95,20 +95,35 @@ class SignupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Users
-        fields = ['email', 'password', 'password2'] #datos que se pediran
-        extra_kwargs = {
-            'password': {'write_only': True}
-        }
+        fields = ['email', 'password', 'password2']
 
-    def save(self): #metodo para comprobar y guardar lo que el usuario esta rellenando
-        user = Users(email=self.validated_data['email'])
-        password = self.validated_data['password']
-        password2 = self.validated_data['password2']
-        if password != password2: #verifica que las password coincidan
+    def create(self, validated_data):
+        password = validated_data['password']
+        password2 = validated_data['password2']
+
+        if password != password2:
             raise serializers.ValidationError({'password': 'Las contraseñas deben coincidir.'})
+
+        user = Users(email=validated_data['email'])
         user.set_password(password)
         user.save()
+        #se genera un token
+        token = default_token_generator.make_token(user)
+        #se envia el email
+        self.send_validation_email(user, token)
+
         return user
+
+    def send_validation_email(self, user, token):
+        subject = 'Validación de cuenta'
+        message = f'Hola {user.email},\n\nHaz clic en el siguiente enlace para validar tu cuenta:\n\nhttp://localhost:3000/validate?token={token}'
+        from_email = 'sender@example.com'
+        recipient_list = [user.email]
+
+        send_mail(subject, message, from_email, recipient_list)
+
+
+
 
 #serializador para cambiar password dentro del perfil de usuario
 class ChangePasswordSerializer(serializers.Serializer):

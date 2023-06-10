@@ -107,16 +107,20 @@ class SignupSerializer(serializers.ModelSerializer):
         user = Users(email=validated_data['email'])
         user.set_password(password)
         user.save()
-        #se genera un token
+
+        # Generar y guardar el token
         token = default_token_generator.make_token(user)
-        #se envia el email
+        user.token = token
+        user.save()
+
+        # Enviar el correo de validación
         self.send_validation_email(user, token)
 
         return user
 
     def send_validation_email(self, user, token):
         subject = 'Validación de cuenta'
-        message = f'Hola {user.email},\n\nHaz clic en el siguiente enlace para validar tu cuenta:\n\nhttp://localhost:3000/validate?token={token}'
+        message = f' Gracias por confiar en SafeStock {user.email} ,\n\nHaz clic en el siguiente enlace para validar tu cuenta:\n\nhttp://localhost:3000/validate?token={token}'
         from_email = 'sender@example.com'
         recipient_list = [user.email]
 

@@ -72,10 +72,10 @@ class SignupView(APIView):
 
 class ValidateAccountView(APIView):
     def post(self, request, pk):
-        token = request.data.get('token')
+        token = request.query_params.get('token')
         user = get_object_or_404(Users, pk=pk)
-
-        if default_token_generator.check_token(user, token):
+        print(token)
+        if token == user.token:  # Comparar el token de la solicitud con el token guardado en el usuario
             user.is_validated = True
             user.save()
             return Response({'detail': 'La cuenta ha sido validada exitosamente.'})
@@ -105,12 +105,12 @@ class LoginView(APIView):
         email = serializer.data.get('email')
         password = serializer.data.get('password')
         user = authenticate(email=email, password=password)
-        if user is not None:
+
+        if user is not None and user.is_validated:  #verifica que el usuario esté validado
             token = get_tokens_for_user(user)
-            return Response({'token': token, 'msg': 'Inicio de sesión exitoso'},
-                            status=status.HTTP_200_OK)
+            return Response({'token': token, 'msg': 'Inicio de sesión exitoso'}, status=status.HTTP_200_OK)
         else:
-            return Response({'errors': {'error_de_campo': ['Email o contraseña invalidos']}},
+            return Response({'errors': {'error_de_campo': ['Email o contraseña inválidos o la cuenta no está validada']}},
                             status=status.HTTP_404_NOT_FOUND)
 
 class LogoutView(APIView):

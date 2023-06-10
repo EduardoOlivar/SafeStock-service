@@ -74,17 +74,18 @@ class ProfileUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Users
-        fields = ['username', 'phone_number', 'image_file'] #atributos que se mostraran
+        fields = ['username', 'phone_number', 'image_file','id'] #atributos que se mostraran
 
     def to_representation(self, instance: Users): #metodo para poder agregar data de otras tablas haciendo joins entre tablas
         data = super().to_representation(instance)
         if hasattr(instance, 'shop'):
             data['name_shop'] = instance.shop.name
             data['address_shop'] = instance.shop.address
+            data['shop_id'] = instance.shop.id
         else:
             data['name_shop'] = None
             data['address_shop'] = None
-
+            data['shop_id'] = None
         return data
 
 

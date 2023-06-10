@@ -60,13 +60,27 @@ class UserProfileView(APIView):
         serializer = ProfileUserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-class SignUpView(APIView):
+
+class SignupView(APIView):
     def post(self, request):
         serializer = SignupSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            user = serializer.save()
+            return Response({'user_id': user.pk}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ValidateAccountView(APIView):
+    def post(self, request, pk):
+        token = request.query_params.get('token')
+        user = get_object_or_404(Users, pk=pk)
+        print(token)
+        if token == user.token:  # Comparar el token de la solicitud con el token guardado en el usuario
+            user.is_validated = True
+            user.save()
+            return Response({'detail': 'La cuenta ha sido validada exitosamente.'})
+
+        return Response({'detail': 'El token de validación es inválido.'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ChangePasswordView(APIView):
@@ -91,13 +105,12 @@ class LoginView(APIView):
         email = serializer.data.get('email')
         password = serializer.data.get('password')
         user = authenticate(email=email, password=password)
-        print(user)
-        if user is not None:
+
+        if user is not None and user.is_validated:  #verifica que el usuario esté validado
             token = get_tokens_for_user(user)
-            return Response({'token': token, 'msg': 'Inicio de sesión exitoso'},
-                            status=status.HTTP_200_OK)
+            return Response({'token': token, 'msg': 'Inicio de sesión exitoso'}, status=status.HTTP_200_OK)
         else:
-            return Response({'errors': {'error_de_campo': ['Email o contraseña invalidos']}},
+            return Response({'errors': {'error_de_campo': ['Email o contraseña inválidos o la cuenta no está validada']}},
                             status=status.HTTP_404_NOT_FOUND)
 
 class LogoutView(APIView):

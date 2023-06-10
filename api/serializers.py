@@ -120,7 +120,7 @@ class SignupSerializer(serializers.ModelSerializer):
 
     def send_validation_email(self, user, token):
         subject = 'Validación de cuenta'
-        message = f' Gracias por confiar en SafeStock {user.email} ,\n\nHaz clic en el siguiente enlace para validar tu cuenta:\n\nhttp://localhost:3000/validate?token={token}'
+        message = f' Gracias por confiar en SafeStock {user.email} ,\n\nHaz clic en el siguiente enlace para validar tu cuenta:\n\nhttp://localhost:3000/validate/?id={user.id}&token={token}'
         from_email = 'sender@example.com'
         recipient_list = [user.email]
 

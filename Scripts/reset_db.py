@@ -1,0 +1,16 @@
+from api.models import *
+
+Users.objects.all().delete()
+ReportSettings.objects.all().delete()
+Recommendations.objects.all().delete()
+Notification.objects.all().delete()
+UserNotification.objects.all().delete()
+Finance.objects.all().delete()
+UserFinances.objects.all().delete()
+Supplier.objects.all().delete()
+Debtor.objects.all().delete()
+Shop.objects.all().delete()
+Category.objects.all().delete()
+Item.objects.all().delete()
+ShopItems.objects.all().delete()
+UserDebtorItems.objects.all().delete()

@@ -78,9 +78,14 @@ class ProfileUserSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance: Users): #metodo para poder agregar data de otras tablas haciendo joins entre tablas
         data = super().to_representation(instance)
-        data['name_shop'] = instance.shop.name
-        data['address_shop'] = instance.shop.address
-        data['shop_id'] = instance.shop.id
+        if hasattr(instance, 'shop'):
+            data['name_shop'] = instance.shop.name
+            data['address_shop'] = instance.shop.address
+            data['shop_id'] = instance.shop.id
+        else:
+            data['name_shop'] = None
+            data['address_shop'] = None
+            data['shop_id'] = None
         return data
 
 

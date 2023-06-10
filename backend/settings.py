@@ -28,11 +28,11 @@ SECRET_KEY = 'django-insecure-jmotql6sn-bb9ypdlyr*5ljfko2kk@6g75chg7ql&9o242*8w!
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
-# ALLOWED_HOSTS = config(
-#     'ALLOWED_HOSTS',
-#     default=['localhost', '127.0.0.1', '0.0.0.0'],
-#     cast=Csv()
-# )
+ALLOWED_HOSTS = config(
+     'ALLOWED_HOSTS',
+     default=['localhost', '127.0.0.1', '0.0.0.0'],
+     cast=Csv()
+ )
 AUTH_USER_MODEL = 'api.Users'
 
 
@@ -115,7 +115,7 @@ else:
             'ENGINE': 'django.db.backends.mysql',
             'NAME': config('DB_DATABASE', default='safe_stock'),
             'USER': config('DB_USER', default='root'),
-            'PASSWORD': config('DB_PASSWORD', default='1234'),
+            'PASSWORD': config('DB_PASSWORD', default=''),
             'HOST': config('DB_IP', default='localhost'),
             'PORT': config('DB_PORT', default='3306')
         }
@@ -170,11 +170,11 @@ TASK_UPLOAD_FILE_MAX_SIZE = 25 *1024 * 1024
 # Max memory file upload
 FILE_UPLOAD_MAX_MEMORY_SIZE = 30 *1024 * 1024
 
-
 # CORS acepta cualquier origen en las peticiones
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:*',
 ]
+CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

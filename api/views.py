@@ -91,7 +91,7 @@ class ChangePasswordView(APIView):
         serializer = self.serializer_class(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         user: Users = request.user
-        user.set_password(serializer.data.get('new_password'))
+        user.set_password(serializer.data.get('password'))
         user.save()
         return Response({'message': 'success'}, status=200)
 
@@ -195,18 +195,6 @@ class UserNotificationDetail(generics.RetrieveUpdateAPIView):
     #permission_classes = (IsAuthenticated,)
 
 
-class FinancesListCreate(generics.ListCreateAPIView):
-    queryset = Finance.objects.filter(is_deleted=False).order_by('pk')
-    serializer_class = FinanceSerializer
-    #permission_classes = (IsAuthenticated,)
-
-
-class FinancesDetail(generics.RetrieveUpdateAPIView):
-    queryset = Finance.objects.filter(is_deleted=False).order_by('pk')
-    serializer_class = FinanceSerializer
-    #permission_classes = (IsAuthenticated,)
-
-
 # Vista para listar y crear finanzas de usuario.
 class UserFinancesListCreate(generics.ListCreateAPIView):
     queryset = UserFinances.objects.filter(is_deleted=False).order_by('pk')
@@ -271,20 +259,6 @@ class DebtorDetail(generics.RetrieveUpdateAPIView):
     #permission_classes = (IsAuthenticated,)
 
 
-# View para listar y crear categorías.
-class CategoryListCreate(generics.ListCreateAPIView):
-    queryset = Category.objects.filter(is_deleted=False).order_by('pk')
-    serializer_class = CategorySerializer
-    #permission_classes = (IsAuthenticated,)
-
-
-# View para obtener detalles y actualizar una categoría específica.
-class CategoryDetail(generics.RetrieveUpdateAPIView):
-    queryset = Category.objects.filter(is_deleted=False).order_by('pk')
-    serializer_class = CategorySerializer
-    #permission_classes = (IsAuthenticated,)
-
-
 # View para listar y crear ítems.
 class ItemListCreate(generics.ListCreateAPIView):
     queryset = Item.objects.filter(is_deleted=False).order_by('pk')
@@ -301,30 +275,17 @@ class ItemDetail(generics.RetrieveUpdateAPIView):
     #permission_classes = (IsAuthenticated,)
 
 
-# View para listar y crear ítems de tienda.
-class ShopItemsListCreate(generics.ListCreateAPIView):
-    queryset = ShopItems.objects.filter(is_deleted=False).order_by('pk')
-    serializer_class = ShopItemsSerializer
-    #permission_classes = (IsAuthenticated,)
-
-
-# View para obtener detalles y actualizar un ítem de tienda específico.
-class ShopItemsDetail(generics.RetrieveUpdateAPIView):
-    queryset = ShopItems.objects.filter(is_deleted=False).order_by('pk')
-    serializer_class = ShopItemsSerializer
-    #permission_classes = (IsAuthenticated,)
-
 
 # View para listar y crear ítems de deudor de usuario.
-class UserDebtorItemsListCreate(generics.ListCreateAPIView):
-    queryset = UserDebtorItems.objects.filter(is_deleted=False).order_by('pk')
+class DebtorItemSoldListCreate(generics.ListAPIView):
+    queryset = DebtorItemSold.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = UserDebtorItemsSerializer
     #permission_classes = (IsAuthenticated,)
 
 
 # View para obtener detalles y actualizar un ítem de deudor de usuario específico.
-class UserDebtorItemsDetail(generics.RetrieveUpdateAPIView):
-    queryset = UserDebtorItems.objects.filter(is_deleted=False).order_by('pk')
+class DebtorItemSoldDetail(generics.RetrieveUpdateAPIView):
+    queryset = DebtorItemSold.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = UserDebtorItemsSerializer
     #permission_classes = (IsAuthenticated,)
 
@@ -382,12 +343,12 @@ class SellItemView(generics.UpdateAPIView):
 
 
 #view para vender a fiados
-class UserDebtorItemsCreateView(generics.ListCreateAPIView):
+class DebtorItemsCreateView(generics.ListCreateAPIView):
     serializer_class = SellDebtorItemSerializer
     # permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        queryset = UserDebtorItems.objects.filter(is_deleted=False)
+        queryset = DebtorItemSold.objects.filter(is_deleted=False)
         search_query = self.request.query_params.get('search', None)# Obtiene el parámetro de busqueda que le llega a la peticion
         if search_query:
             queryset = queryset.filter(items_id__name__icontains=search_query)# Filtra los registros por el nombre del producto
@@ -395,7 +356,7 @@ class UserDebtorItemsCreateView(generics.ListCreateAPIView):
 
 
 class RemoveUserDebtorItemsView(generics.RetrieveUpdateAPIView):
-    queryset = UserDebtorItems.objects.filter(is_deleted=False)
+    queryset = DebtorItemSold.objects.filter(is_deleted=False)
     serializer_class = RemoveUserDebtorItemsSerializer
     #permission_classes = (IsAuthenticated,)
 

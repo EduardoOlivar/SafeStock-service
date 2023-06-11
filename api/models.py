@@ -91,42 +91,20 @@ class UserNotification(GenericAttributes):
     details = models.TextField(**common_args)
 
 
-#tabla de finanzas
-class Finance(GenericAttributes):
-    users_finance_id = models.ManyToManyField(Users, blank=True, through='UserFinances', related_name='financesusers')
-    period = models.IntegerField(**common_args) #atributo para que el usuario elija cada cuanto tiempo quiere las notificaciones de su finanzas
-    max_spend = models.IntegerField(**common_args, default=0)
-
-
 #tabla para el registro si es una ganancia o es un gasto
 class UserFinances(GenericAttributes):
     AVAILABLE_FINANCE_TYPE = [
         ('profit', 'Ganancia'),
         ('cost', 'Gasto')
     ]
-    finance_id = models.ForeignKey(Finance, on_delete=models.CASCADE, **common_args, related_name='userfinances')
     user_id = models.ForeignKey(Users, on_delete=models.CASCADE, **common_args, related_name='userfinances')
     type = models.TextField(**common_args, choices=AVAILABLE_FINANCE_TYPE, default='profit')
     details = models.TextField(**common_args)
     total = models.FloatField(**common_args)
 
 
-#tabla para el proveedor
-class Supplier(GenericAttributes):
-    name = models.TextField(**common_args)
-    phone_number = models.TextField(**common_args)
-    details = models.TextField(**common_args)
-    user_id = models.ForeignKey(Users, **common_args,on_delete=models.CASCADE, related_name='supplier')
 
-
-#tabla para el fiado
-class Debtor(GenericAttributes):
-    name = models.TextField(**common_args)
-    details = models.TextField(**common_args)
-    user_id = models.ManyToManyField(Users, blank=True, through='UserDebtorItems')
-
-
-#tabla del negocio
+#tabla para el negocio
 class Shop(GenericAttributes):
     AVAILABLE_SHOP_TYPE = [
         ('negocio_pequeño', 'Negocio de Barrio'),
@@ -138,8 +116,6 @@ class Shop(GenericAttributes):
     user_id = models.OneToOneField(Users, on_delete=models.CASCADE, **common_args, related_name='shop')
     name = models.TextField(**common_args)
     image_file = models.FileField(upload_to='shop/images/', **common_args)
-    city = models.TextField(**common_args)
-    commune = models.TextField(**common_args)
     address = models.TextField(**common_args)
     shop_type = models.TextField(**common_args, choices=AVAILABLE_SHOP_TYPE, default='negocio_pequeño')
     open_days = models.IntegerField(**common_args)
@@ -147,37 +123,49 @@ class Shop(GenericAttributes):
     close_at = models.TimeField(**common_args)
 
 
-#categorias que se mostraran de forma automatica para los productos
-class Category(GenericAttributes):
+
+#tabla para el proveedor
+class Supplier(GenericAttributes):
+    name = models.TextField(**common_args)
+    phone_number = models.TextField(**common_args)
+    details = models.TextField(**common_args)
+    shop_id = models.ForeignKey(Shop, **common_args,on_delete=models.CASCADE, related_name='supplier')
+
+
+#tabla del deudor
+class Debtor(GenericAttributes):
+    name = models.TextField(**common_args)
+    details = models.TextField(**common_args)
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE, **common_args, related_name='debtor')
+
+
+#tabla para los productos del negocio
+class Item(GenericAttributes):
     AVAILABLE_CATEGORY = [
         ('lacteos', 'Lacteos'),
         ('carniceria', 'Carniceria'),
         ('panaderia', 'Panaderia'),
-        ('despensa', 'Despensa'), #aqui poner que la despensa es para arroz, fideos, etc
+        ('despensa', 'Despensa'),  # aqui poner que la despensa es para arroz, fideos, etc
         ('botilleria', 'Botilleria'),
         ('frutas_verduras', 'Frutas o Verduras'),
         ('limpieza', 'Limpieza'),
         ('mascotas', 'Mascotas')
     ]
     category = models.TextField(**common_args, choices=AVAILABLE_CATEGORY, default='despensa')
-
-
-#tabla para los productos del negocio
-class Item(GenericAttributes):
-    categories_id = models.ForeignKey(Category, on_delete=models.CASCADE, **common_args, related_name='item')
     name = models.TextField(**common_args)
     buy_price = models.IntegerField(**common_args, default=0)
     sell_price = models.IntegerField(**common_args, default=0)
     details = models.TextField(**common_args)
     quantity = models.IntegerField(**common_args, default=0) # la catidad sera por unidad
     weight = models.IntegerField(**common_args, default=0) # peso se medira en gramos
-    shop = models.ManyToManyField(Shop, blank=True, through='ShopItems')
+    shop_id = models.ForeignKey(Shop, on_delete=models.CASCADE, **common_args, related_name='item')
+    item_sold = models.ManyToManyField(Shop, blank=True, through='ShopItemSold', related_name='item_sold')
 
 
 #tabla para suponer una venta y poder tener registro de lo que se "vendio"
-class ShopItems(GenericAttributes):
-    shop_id = models.ForeignKey(Shop, on_delete=models.CASCADE, **common_args, related_name='shopitems')
-    item_id = models.OneToOneField(Item, on_delete=models.CASCADE, **common_args, related_name='shopitems')
+class ShopItemSold(GenericAttributes):
+    shop_id = models.ForeignKey(Shop, on_delete=models.CASCADE, **common_args, related_name='shopitemsold')
+    item_id = models.OneToOneField(Item, on_delete=models.CASCADE, **common_args, related_name='shopitemsold')
     total_sold = models.IntegerField(**common_args, default=0)  # atributo para tener un registro de la venta
     quantity_sold = models.IntegerField(**common_args, default=0) # la catidad sera por unidad
     weight_sold = models.IntegerField(**common_args, default=0) # peso se medira en gramos
@@ -185,9 +173,8 @@ class ShopItems(GenericAttributes):
 
 
 #tabla para guardar el registro de los items que el usuario fio
-class UserDebtorItems(GenericAttributes):
+class DebtorItemSold(GenericAttributes):
     debtors_id = models.ForeignKey(Debtor, on_delete=models.CASCADE, **common_args, related_name='interdebtors')
-    user_id = models.ForeignKey(Users, on_delete=models.CASCADE, **common_args, related_name='interusers')
     items_id = models.ForeignKey(Item, on_delete=models.CASCADE, **common_args, related_name='interitems')
     quantity_debtor = models.FloatField(**common_args)
     weight_debtor = models.FloatField(**common_args)

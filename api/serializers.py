@@ -120,7 +120,7 @@ class SignupSerializer(serializers.ModelSerializer):
 
     def send_validation_email(self, user, token):
         subject = 'Validación de cuenta'
-        message = f' Gracias por confiar en SafeStock {user.email} ,\n\nHaz clic en el siguiente enlace para validar tu cuenta:\n\nhttp://localhost:3000/validate/?id={user.id}&token={token}'
+        message = f'Gracias por confiar en SafeStock {user.email} ,\n\nHaz clic en el siguiente enlace para validar tu cuenta:\n\nhttp://localhost:3000/validate/?id={user.id}&token={token}'
         from_email = 'sender@example.com'
         recipient_list = [user.email]
 
@@ -132,13 +132,13 @@ class SignupSerializer(serializers.ModelSerializer):
 #serializador para cambiar password dentro del perfil de usuario
 class ChangePasswordSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=255, required=True)
-    new_password = serializers.CharField(max_length=255, required=True)
+    password2 = serializers.CharField(max_length=255, required=True)
 
     def validate(self, attrs): #metodo para validar las password al momento de cambiarlas
         password = attrs.get('password')
-        new_password = attrs.get('new_password')
+        password2 = attrs.get('password2')
         user = self.context.get('user') #obtiene al usuario a traves del token
-        if password != new_password: #verifica que las password coincidan
+        if password != password2: #verifica que las password coincidan
             raise serializers.ValidationError("Las contraseñas no coinciden")
         user.set_password(password)
         user.save() #metodo para guardar y encriptar la password
@@ -231,13 +231,6 @@ class UserNotificationSerializer(serializers.ModelSerializer):
         exclude = [*generic_fields]
 
 
-    # Serializador para Finance
-class FinanceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Finance
-        exclude = [*generic_fields]
-
-
     # Serializador para UserFinances
 class UserFinancesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -259,12 +252,6 @@ class DebtorSerializer(serializers.ModelSerializer):
         exclude = [*generic_fields]
 
 
-    # Serializador para Category
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        exclude = [*generic_fields]
-
 
 # Serializador para Item
 class ItemSerializer(serializers.ModelSerializer):
@@ -274,19 +261,11 @@ class ItemSerializer(serializers.ModelSerializer):
         exclude = [*generic_fields]
 
 
-# Serializador para ShopItems
-class ShopItemsSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = ShopItems
-        exclude = [*generic_fields]
-
-
 # Serializador para UserDebtorItems
 class UserDebtorItemsSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = UserDebtorItems
+        model = DebtorItemSold
         exclude = [*generic_fields]
 
 
@@ -373,7 +352,7 @@ class SellItemSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError('No hay suficiente stock disponible para realizar la venta.')
             sold_price = quantity_sold * instance.sell_price
             # Crea un nuevo registro en ShopItems para la venta por cantidad
-            shop_item = ShopItems.objects.create(
+            shop_item = ShopItemSold.objects.create(
                 shop_id=request.user.shop.id,
                 item_id=instance.id,
                 total_sold=sold_price,
@@ -389,28 +368,27 @@ class SellItemSerializer(serializers.ModelSerializer):
             if weight_sold > instance.weight:# Validar si hay suficiente peso disponible para realizar la venta
                 raise serializers.ValidationError('No hay suficiente peso disponible para realizar la venta.')
             # Crea un nuevo registro en ShopItems para la venta por peso
-            sold_price = weight_sold * instance.sell_price # total de la venta
-            shop_item = ShopItems.objects.create(
+            sold_price = (weight_sold/1000) * instance.sell_price # total de la venta
+            shop_item = ShopItemSold.objects.create(
                 shop_id=request.user.shop.id,
                 item_id=instance.id,
-                total_sold=sold_price,
+                total_sold=round(sold_price),
                 quantity_sold=0,  # No se considera la cantidad vendida en caso de venta por peso
                 weight_sold=weight_sold
             )
-            instance.quantity = 0
+            instance.weight -= weight_sold
             instance.save()
         return instance
 
 
 class SellDebtorItemSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserDebtorItems
+        model = DebtorItemSold
         exclude = [*generic_fields]
 
     def create(self, validated_data):
         items_data = self.context['request'].data['items']
         debtor = validated_data['debtors_id']
-        user = validated_data['user_id']
         debtor_items = []
 
         for item_data in items_data: #se recorren los productos o el producto
@@ -430,10 +408,9 @@ class SellDebtorItemSerializer(serializers.ModelSerializer):
             elif weight_debtor: # si es peso se decrementa en la tabla de item
                 item.weight -= weight_debtor
             item.save() #se guarda
-            #se crea una instancia para guardar los resultados en la tabla UserDebtorItems
-            debtor_item = UserDebtorItems(
+            #se crea una instancia para guardar los resultados en la tabla DebtorItems
+            debtor_item = DebtorItemSold(
                 debtors_id=debtor,
-                user_id=user,
                 items_id=item,
                 quantity_debtor=quantity_debtor,
                 weight_debtor=weight_debtor,
@@ -442,7 +419,7 @@ class SellDebtorItemSerializer(serializers.ModelSerializer):
             )
             debtor_items.append(debtor_item)
 
-        UserDebtorItems.objects.bulk_create(debtor_items)
+        DebtorItemSold.objects.bulk_create(debtor_items)
         return debtor_items
 
 
@@ -450,7 +427,7 @@ class SellDebtorItemSerializer(serializers.ModelSerializer):
 class RemoveUserDebtorItemsSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = UserDebtorItems
+        model = DebtorItemSold
         exclude = [*generic_fields]
 
     def update(self, instance, validated_data):

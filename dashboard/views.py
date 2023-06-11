@@ -52,7 +52,7 @@ class ReportShopAllItemView(GenericDashBoard):
             report_entry = {}
 
             #consulta para obtener los datos de venta por dia
-            shop_items = ShopItems.objects.filter(shop_id=shop.id, date__date=current_date.date())
+            shop_items = ShopItemSold.objects.filter(shop_id=shop.id, date__date=current_date.date())
 
             if shop_items:
                 #se guarda los datos si existe el item en la shop para el dia
@@ -101,7 +101,7 @@ class ReportShopItemView(GenericDashBoard):
             report_entry = {}
 
             #consulta para obtener los datos de venta por dia
-            shop_item = ShopItems.objects.filter(shop_id=shop.id, item_id=item.id,
+            shop_item = ShopItemSold.objects.filter(shop_id=shop.id, item_id=item.id,
                                                  date__date=current_date.date()).first()
 
             if shop_item:

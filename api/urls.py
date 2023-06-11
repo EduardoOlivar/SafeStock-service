@@ -28,8 +28,6 @@ urlpatterns = [
     re_path(r'^user_notification/(?P<pk>[0-9]+)/$', views.UserNotificationDetail.as_view()),# Endpoint para consultar una notificación específica de un usuario
 
     # Endpoints para finanzas
-    re_path(r'^finances/all/$', views.FinancesListCreate.as_view()),  # Endpoint para consultar listado de finanzas
-    re_path(r'^finances/(?P<pk>[0-9]+)/$', views.FinancesDetail.as_view()),# Endpoint para consultar, actualizar o eliminar una finanza
     re_path(r'^user_finances/all/$', views.UserFinancesListCreate.as_view()),# Endpoint para consultar listado de finanzas de usuario
     re_path(r'^user_finances/(?P<pk>[0-9]+)/$', views.UserFinancesDetail.as_view()),# Endpoint para consultar, actualizar o eliminar una finanza de usuario
 
@@ -40,26 +38,21 @@ urlpatterns = [
     # Endpoints para deudores
     re_path(r'^debtors/all/$', views.DebtorListCreate.as_view()),# Endpoint para consultar listado de deudores
     re_path(r'^debtors/(?P<pk>[0-9]+)/$', views.DebtorDetail.as_view()),# Endpoint para consultar, actualizar o eliminar un deudor
-    # Endpoints para categorías
-    re_path(r'^categories/(?P<pk>[0-9]+)/$', views.CategoryDetail.as_view()),# Endpoint para consultar, actualizar o eliminar una categoría
 
     # Endpoints para productos
     re_path(r'^items/all/$', views.ItemListCreate.as_view()),# Endpoint para consultar listado de productos
     re_path(r'^items/(?P<pk>[0-9]+)/$', views.ItemDetail.as_view()),# Endpoint para consultar, actualizar o eliminar un producto
 
-    # Endpoints para ítems de tienda
-    re_path(r'^shops_items/all/$', views.ShopItemsListCreate.as_view()),# Endpoint para consultar listado de ítems de tienda
-    re_path(r'^shops_items/(?P<pk>[0-9]+)/$', views.ShopItemsDetail.as_view()),# Endpoint para consultar, actualizar o eliminar un ítem de tienda
 
     # Endpoints para ítems de deudor de usuario
-    re_path(r'^user_debtor_items/all/$', views.UserDebtorItemsListCreate.as_view()),# Endpoint para consultar y crear ítems de deudor de usuario
-    re_path(r'^user_debtor_items/(?P<pk>[0-9]+)/$', views.UserDebtorItemsDetail.as_view()),# Endpoint para consultar, actualizar o eliminar un ítem de deudor de usuario
+    re_path(r'^debtor_items/all/$', views.DebtorItemSoldListCreate.as_view()),# Endpoint para consultar y crear ítems de deudor de usuario
+    re_path(r'^debtor_items/(?P<pk>[0-9]+)/$', views.DebtorItemSoldDetail.as_view()),# Endpoint para consultar, actualizar o eliminar un ítem de deudor de usuario
 
     # Endpoints para eliminar proveedor, finanza, producto, deuda, deudor
     re_path(r'^remove_supplier/(?P<pk>[0-9]+)/$', views.SupplierRemoveListView.as_view()),# Endpoint para eliminar un proveedor
     re_path(r'^remove_finance/(?P<pk>[0-9]+)/$', views.RemoveUserFinanceView.as_view()),# Endpoint para eliminar una finanza de usuario
     re_path(r'^remove_item/(?P<pk>[0-9]+)/$', views.RemoveItemView.as_view()),# Endpoint para eliminar un producto
-    re_path(r'^remove_debtor_user_item/(?P<pk>[0-9]+)/$', views.RemoveUserDebtorItemsView.as_view()),# Endpoint para eliminar una deuda
+    re_path(r'^remove_debtor_user_item/(?P<pk>[0-9]+)/$', views.RemoveUserDebtorItemsView.as_view()),# Endpoint para eliminar una deuda (pagar)
     re_path(r'^remove_debtor/(?P<pk>[0-9]+)/$', views.RemoveDebtorView.as_view()),# Endpoint para eliminar una fiado(deudor)
 
     # Endpoints para listas de tiendas
@@ -69,8 +62,8 @@ urlpatterns = [
     # Endpoint para vender un ítem
     re_path(r'^sell_item/(?P<pk>[0-9]+)/$', views.SellItemView.as_view()),  # Endpoint para vender un ítem
 
-    # Endpoint para consultar y crear productos de un fiado
-    re_path(r'^debtor_items/all/$', views.UserDebtorItemsCreateView.as_view()),# Endpoint para consultar y crear productos para un fiado
+    # Endpoint para simular venta a un fiado
+    re_path(r'^sell_item_debtor/$', views.DebtorItemsCreateView.as_view()),# Endpoint para simular venta a un fiado
 ]
 
 

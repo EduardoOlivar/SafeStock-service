@@ -57,6 +57,7 @@ urlpatterns = [
 
     # Endpoints para listas de tiendas
     re_path(r'^shop_list/all/$', views.ShopListView.as_view()),  # Endpoint para consultar listado de tiendas
+    re_path(r'^shop/(?P<shop_id>[0-9]+)/items/$', views.ShopItemsView.as_view()),  # Endpoint para mostrar los items por tienda
     re_path(r'^shop_list/(?P<pk>[0-9]+)/$', views.ShopDetailView.as_view()),# Endpoint para consultar, actualizar o eliminar una tienda
 
     # Endpoint para vender un ítem

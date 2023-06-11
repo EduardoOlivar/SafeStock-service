@@ -261,6 +261,13 @@ class ItemSerializer(serializers.ModelSerializer):
         exclude = [*generic_fields]
 
 
+class ShopItemAllSerializer(serializers.ModelSerializer):
+    item = ItemSerializer(many=True, read_only=True)
+    class Meta:
+        model = Shop
+        exclude = [*generic_fields]
+
+
 # Serializador para UserDebtorItems
 class UserDebtorItemsSerializer(serializers.ModelSerializer):
 

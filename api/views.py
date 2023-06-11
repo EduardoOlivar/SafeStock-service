@@ -1,5 +1,5 @@
 from rest_framework.filters import SearchFilter
-
+import json
 from api.serializers import *
 from rest_framework import generics
 from rest_framework.views import APIView
@@ -263,7 +263,8 @@ class DebtorDetail(generics.RetrieveUpdateAPIView):
 class ItemListCreate(generics.ListCreateAPIView):
     queryset = Item.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = ItemSerializer
-    filter_backends = [SearchFilter] #filtros backend para el nombre precio de compra y precio de venta
+    filter_backends = [SearchFilter,DjangoFilterBackend] #filtros backend para el nombre precio de compra y precio de venta\
+    filterset_fields = ['shop_id']
     search_fields = ['name', 'buy_price', 'sell_price']
     #permission_classes = (IsAuthenticated,)
 
@@ -365,3 +366,19 @@ class RemoveDebtorView(generics.RetrieveUpdateAPIView):
     queryset = Debtor.objects.filter(is_deleted=False)
     serializer_class = RemoveDebtorSerializer
     #permission_classes = (IsAuthenticated,)
+
+
+class ShopItemsView(generics.ListAPIView):
+    serializer_class = ItemSerializer
+    #permission_classes = (IsAuthenticated,)
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['name','buy_price', 'sell_price','quantity','weight','category']
+
+    def get_queryset(self):
+        shop_id = self.kwargs['shop_id']
+        shop_exists = Shop.objects.filter(id=shop_id).exists()
+        if not shop_exists:
+            return {}
+
+        shop = Shop.objects.get(id=shop_id)
+        return shop.item.filter(is_deleted=False)

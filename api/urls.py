@@ -28,11 +28,13 @@ urlpatterns = [
     re_path(r'^user_notification/(?P<pk>[0-9]+)/$', views.UserNotificationDetail.as_view()),# Endpoint para consultar una notificación específica de un usuario
 
     # Endpoints para finanzas
-    re_path(r'^user_finances/all/$', views.UserFinancesListCreate.as_view()),# Endpoint para consultar listado de finanzas de usuario
-    re_path(r'^user_finances/(?P<pk>[0-9]+)/$', views.UserFinancesDetail.as_view()),# Endpoint para consultar, actualizar o eliminar una finanza de usuario
+    re_path(r'^shop_finances/all/$', views.ShopFinancesListCreate.as_view()),# Endpoint para consultar listado de finanzas de usuario
+    re_path(r'^shop/(?P<shop_id>[0-9]+)/finances/all/$', views.ShopFinancesView.as_view()), # Endpoint para mostrar las finanzas por tienda
+    re_path(r'^shop_finances/(?P<pk>[0-9]+)/$', views.ShopFinancesDetail.as_view()),# Endpoint para consultar, actualizar o eliminar una finanza de usuario
 
     # Endpoints para proveedores
     re_path(r'^suppliers/all/$', views.SupplierListCreate.as_view()),# Endpoint para consultar listado de proveedores
+    re_path(r'^shop/(?P<shop_id>[0-9]+)/supplier/all/$', views.ShopSupplierView.as_view()), # Endpoint para mostrar los proveedores por tienda
     re_path(r'^suppliers/(?P<pk>[0-9]+)/$', views.SupplierDetail.as_view()),# Endpoint para consultar, actualizar o eliminar un proveedor
 
     # Endpoints para deudores
@@ -46,18 +48,19 @@ urlpatterns = [
 
     # Endpoints para ítems de deudor de usuario
     re_path(r'^debtor_items/all/$', views.DebtorItemSoldListCreate.as_view()),# Endpoint para consultar y crear ítems de deudor de usuario
+    re_path(r'^shop/(?P<shop_id>[0-9]+)/debtor/all/$', views.ShopDebtorView.as_view()),# Endpoint para mostrar los deudores por tienda
     re_path(r'^debtor_items/(?P<pk>[0-9]+)/$', views.DebtorItemSoldDetail.as_view()),# Endpoint para consultar, actualizar o eliminar un ítem de deudor de usuario
 
     # Endpoints para eliminar proveedor, finanza, producto, deuda, deudor
     re_path(r'^remove_supplier/(?P<pk>[0-9]+)/$', views.SupplierRemoveListView.as_view()),# Endpoint para eliminar un proveedor
-    re_path(r'^remove_finance/(?P<pk>[0-9]+)/$', views.RemoveUserFinanceView.as_view()),# Endpoint para eliminar una finanza de usuario
+    re_path(r'^remove_finance/(?P<pk>[0-9]+)/$', views.RemoveShopFinanceView.as_view()),# Endpoint para eliminar una finanza de usuario
     re_path(r'^remove_item/(?P<pk>[0-9]+)/$', views.RemoveItemView.as_view()),# Endpoint para eliminar un producto
     re_path(r'^remove_debtor_user_item/(?P<pk>[0-9]+)/$', views.RemoveUserDebtorItemsView.as_view()),# Endpoint para eliminar una deuda (pagar)
     re_path(r'^remove_debtor/(?P<pk>[0-9]+)/$', views.RemoveDebtorView.as_view()),# Endpoint para eliminar una fiado(deudor)
 
     # Endpoints para listas de tiendas
     re_path(r'^shop_list/all/$', views.ShopListView.as_view()),  # Endpoint para consultar listado de tiendas
-    re_path(r'^shop/(?P<shop_id>[0-9]+)/items/$', views.ShopItemsView.as_view()),  # Endpoint para mostrar los items por tienda
+    re_path(r'^shop/(?P<shop_id>[0-9]+)/items/all/$', views.ShopItemsView.as_view()),  # Endpoint para mostrar los items por tienda
     re_path(r'^shop_list/(?P<pk>[0-9]+)/$', views.ShopDetailView.as_view()),# Endpoint para consultar, actualizar o eliminar una tienda
 
     # Endpoint para vender un ítem

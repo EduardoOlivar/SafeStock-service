@@ -91,19 +91,6 @@ class UserNotification(GenericAttributes):
     details = models.TextField(**common_args)
 
 
-#tabla para el registro si es una ganancia o es un gasto
-class UserFinances(GenericAttributes):
-    AVAILABLE_FINANCE_TYPE = [
-        ('profit', 'Ganancia'),
-        ('cost', 'Gasto')
-    ]
-    user_id = models.ForeignKey(Users, on_delete=models.CASCADE, **common_args, related_name='userfinances')
-    type = models.TextField(**common_args, choices=AVAILABLE_FINANCE_TYPE, default='profit')
-    details = models.TextField(**common_args)
-    total = models.FloatField(**common_args)
-
-
-
 #tabla para el negocio
 class Shop(GenericAttributes):
     AVAILABLE_SHOP_TYPE = [
@@ -121,6 +108,18 @@ class Shop(GenericAttributes):
     open_days = models.IntegerField(**common_args)
     opens_at = models.TimeField(**common_args)
     close_at = models.TimeField(**common_args)
+
+
+#tabla para el registro si es una ganancia o es un gasto
+class ShopFinances(GenericAttributes):
+    AVAILABLE_FINANCE_TYPE = [
+        ('profit', 'Ganancia'),
+        ('cost', 'Gasto')
+    ]
+    shop_id = models.ForeignKey(Shop, on_delete=models.CASCADE, **common_args, related_name='shopfinances')
+    type = models.TextField(**common_args, choices=AVAILABLE_FINANCE_TYPE, default='profit')
+    details = models.TextField(**common_args)
+    total = models.FloatField(**common_args)
 
 
 

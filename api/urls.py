@@ -55,7 +55,7 @@ urlpatterns = [
     re_path(r'^remove_supplier/(?P<pk>[0-9]+)/$', views.SupplierRemoveListView.as_view()),# Endpoint para eliminar un proveedor
     re_path(r'^remove_finance/(?P<pk>[0-9]+)/$', views.RemoveShopFinanceView.as_view()),# Endpoint para eliminar una finanza de usuario
     re_path(r'^remove_item/(?P<pk>[0-9]+)/$', views.RemoveItemView.as_view()),# Endpoint para eliminar un producto
-    re_path(r'^remove_debtor_user_item/(?P<pk>[0-9]+)/$', views.RemoveUserDebtorItemsView.as_view()),# Endpoint para eliminar una deuda (pagar)
+    re_path(r'^paid_debtor_item/(?P<pk>[0-9]+)/$', views.PaidDebtorItemsView.as_view()),# Endpoint para pagar una deuda
     re_path(r'^remove_debtor/(?P<pk>[0-9]+)/$', views.RemoveDebtorView.as_view()),# Endpoint para eliminar una fiado(deudor)
 
     # Endpoints para listas de tiendas

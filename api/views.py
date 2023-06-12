@@ -356,9 +356,9 @@ class DebtorItemsCreateView(generics.ListCreateAPIView):
         return queryset
 
 
-class RemoveUserDebtorItemsView(generics.RetrieveUpdateAPIView):
+class PaidDebtorItemsView(generics.RetrieveUpdateAPIView):
     queryset = DebtorItemSold.objects.filter(is_deleted=False)
-    serializer_class = RemoveUserDebtorItemsSerializer
+    serializer_class = PaidDebtorItemsSerializer
     #permission_classes = (IsAuthenticated,)
 
 

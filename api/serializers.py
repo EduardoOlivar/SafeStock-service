@@ -444,15 +444,15 @@ class SellDebtorItemSerializer(serializers.ModelSerializer):
         return debtor_items
 
 
-#serializador para eliminar de manera logica una deuda
-class RemoveUserDebtorItemsSerializer(serializers.ModelSerializer):
+#serializador para el pago de manera logica una deuda
+class PaidDebtorItemsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DebtorItemSold
         exclude = [*generic_fields]
 
     def update(self, instance, validated_data):
-        instance.is_deleted = True #dato para eliminar de manera logica
+        instance.is_paid = True #dato para simular el pago de manera logica
         instance.save()
         return instance
 

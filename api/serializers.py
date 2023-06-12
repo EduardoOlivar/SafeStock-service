@@ -232,44 +232,58 @@ class UserNotificationSerializer(serializers.ModelSerializer):
 
 
     # Serializador para UserFinances
-class UserFinancesSerializer(serializers.ModelSerializer):
+class ShopFinancesSerializer(serializers.ModelSerializer):
+    creation_date = serializers.SerializerMethodField()
+
+    def get_creation_date(self, instance):
+        return int(instance.creation_date.timestamp())
     class Meta:
-        model = UserFinances
-        exclude = [*generic_fields]
+        model = ShopFinances
+        exclude = ['last_update','is_deleted']
 
 
     # Serializador para Supplier
 class SupplierSerializer(serializers.ModelSerializer):
+    creation_date = serializers.SerializerMethodField()
+
+    def get_creation_date(self, instance):
+        return int(instance.creation_date.timestamp())
+
     class Meta:
         model = Supplier
-        exclude = [*generic_fields]
+        exclude = ['last_update','is_deleted']
 
 
     # Serializador para Debtor
 class DebtorSerializer(serializers.ModelSerializer):
+    creation_date = serializers.SerializerMethodField()
+
+    def get_creation_date(self, instance):
+        return int(instance.creation_date.timestamp())
+
     class Meta:
         model = Debtor
-        exclude = [*generic_fields]
+        exclude = ['last_update','is_deleted']
 
 
 
 # Serializador para Item
 class ItemSerializer(serializers.ModelSerializer):
+    creation_date = serializers.SerializerMethodField()
 
+    def get_creation_date(self, instance):
+        return int(instance.creation_date.timestamp())
     class Meta:
         model = Item
-        exclude = [*generic_fields]
+        exclude = ['last_update','is_deleted','item_sold']
 
 
-class ShopItemAllSerializer(serializers.ModelSerializer):
-    item = ItemSerializer(many=True, read_only=True)
-    class Meta:
-        model = Shop
-        exclude = [*generic_fields]
+
+
 
 
 # Serializador para UserDebtorItems
-class UserDebtorItemsSerializer(serializers.ModelSerializer):
+class DebtorItemsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DebtorItemSold
@@ -290,10 +304,10 @@ class RemoveSupplierSerializer(serializers.ModelSerializer):
 
 
 #serializador para eliminar de manera logica una finanza (gasto o ganancia)
-class RemoveUserFinanceSerializer(serializers.ModelSerializer):
+class RemoveShopFinanceSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = UserFinances
+        model = ShopFinances
         exclude = [*generic_fields]
 
     def update(self, instance, validated_data):

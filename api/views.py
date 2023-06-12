@@ -1,5 +1,4 @@
 from rest_framework.filters import SearchFilter
-import json
 from api.serializers import *
 from rest_framework import generics
 from rest_framework.views import APIView
@@ -196,12 +195,13 @@ class UserNotificationDetail(generics.RetrieveUpdateAPIView):
 
 
 # Vista para listar y crear finanzas de usuario.
-class UserFinancesListCreate(generics.ListCreateAPIView):
-    queryset = UserFinances.objects.filter(is_deleted=False).order_by('pk')
-    serializer_class = UserFinancesSerializer
-    filter_backends = [SearchFilter]
+class ShopFinancesListCreate(generics.ListCreateAPIView):
+    queryset = ShopFinances.objects.filter(is_deleted=False).order_by('pk')
+    serializer_class = ShopFinancesSerializer
+    filter_backends = [SearchFilter,DjangoFilterBackend]
+    filterset_fields = ['shop_id', 'type', 'total']
     search_fields = ['type', 'total']
-    permission_classes = (IsAuthenticated,)
+    #permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -218,9 +218,9 @@ class UserFinancesListCreate(generics.ListCreateAPIView):
         return queryset
 
 
-class UserFinancesDetail(generics.RetrieveUpdateAPIView):
-    queryset = UserFinances.objects.filter(is_deleted=False).order_by('pk')
-    serializer_class = UserFinancesSerializer
+class ShopFinancesDetail(generics.RetrieveUpdateAPIView):
+    queryset = ShopFinances.objects.filter(is_deleted=False).order_by('pk')
+    serializer_class = ShopFinancesSerializer
     #permission_classes = (IsAuthenticated,)
 
 
@@ -229,7 +229,7 @@ class SupplierListCreate(generics.ListCreateAPIView):
     serializer_class = SupplierSerializer
     filter_backends = [SearchFilter]
     search_fields = ['name']
-    permission_classes = (IsAuthenticated,)
+    #permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -280,14 +280,14 @@ class ItemDetail(generics.RetrieveUpdateAPIView):
 # View para listar y crear ítems de deudor de usuario.
 class DebtorItemSoldListCreate(generics.ListAPIView):
     queryset = DebtorItemSold.objects.filter(is_deleted=False).order_by('pk')
-    serializer_class = UserDebtorItemsSerializer
+    serializer_class = DebtorItemsSerializer
     #permission_classes = (IsAuthenticated,)
 
 
 # View para obtener detalles y actualizar un ítem de deudor de usuario específico.
 class DebtorItemSoldDetail(generics.RetrieveUpdateAPIView):
     queryset = DebtorItemSold.objects.filter(is_deleted=False).order_by('pk')
-    serializer_class = UserDebtorItemsSerializer
+    serializer_class = DebtorItemsSerializer
     #permission_classes = (IsAuthenticated,)
 
 
@@ -299,9 +299,9 @@ class SupplierRemoveListView(generics.RetrieveUpdateAPIView):
 
 
 # View para eliminado logico.
-class RemoveUserFinanceView(generics.RetrieveUpdateAPIView):
-    queryset = UserFinances.objects.filter(is_deleted=False)
-    serializer_class = RemoveUserFinanceSerializer
+class RemoveShopFinanceView(generics.RetrieveUpdateAPIView):
+    queryset = ShopFinances.objects.filter(is_deleted=False)
+    serializer_class = RemoveShopFinanceSerializer
     #permission_classes = (IsAuthenticated,)
 
 
@@ -372,13 +372,60 @@ class ShopItemsView(generics.ListAPIView):
     serializer_class = ItemSerializer
     #permission_classes = (IsAuthenticated,)
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['name','buy_price', 'sell_price','quantity','weight','category']
+    filterset_fields = ['name','buy_price', 'sell_price','quantity','weight','category','creation_date']
 
     def get_queryset(self):
         shop_id = self.kwargs['shop_id']
         shop_exists = Shop.objects.filter(id=shop_id).exists()
         if not shop_exists:
-            return {}
+            return None
 
         shop = Shop.objects.get(id=shop_id)
         return shop.item.filter(is_deleted=False)
+
+
+class ShopDebtorView(generics.ListAPIView):
+    serializer_class = DebtorSerializer
+    #permission_classes = (IsAuthenticated,)
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['name','creation_date']
+
+    def get_queryset(self):
+        shop_id = self.kwargs['shop_id']
+        shop_exists = Shop.objects.filter(id=shop_id).exists()
+        if not shop_exists:
+            return None
+
+        shop = Shop.objects.get(id=shop_id)
+        return shop.debtor.filter(is_deleted=False)
+
+
+class ShopSupplierView(generics.ListAPIView):
+    serializer_class = SupplierSerializer
+    #permission_classes = (IsAuthenticated,)
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['name','creation_date']
+
+    def get_queryset(self):
+        shop_id = self.kwargs['shop_id']
+        shop_exists = Shop.objects.filter(id=shop_id).exists()
+        if not shop_exists:
+            return None
+
+        shop = Shop.objects.get(id=shop_id)
+        return shop.supplier.filter(is_deleted=False)
+
+class ShopFinancesView(generics.ListAPIView):
+    serializer_class = ShopFinancesSerializer
+    #permission_classes = (IsAuthenticated,)
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['type','total','creation_date']
+
+    def get_queryset(self):
+        shop_id = self.kwargs['shop_id']
+        shop_exists = Shop.objects.filter(id=shop_id).exists()
+        if not shop_exists:
+            return None
+
+        shop = Shop.objects.get(id=shop_id)
+        return shop.shopfinances.filter(is_deleted=False)

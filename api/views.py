@@ -381,7 +381,13 @@ class ShopItemsView(generics.ListAPIView):
             return None
 
         shop = Shop.objects.get(id=shop_id)
-        return shop.item.filter(is_deleted=False)
+        name_filter = self.request.query_params.get('name', None)
+        if name_filter:
+            queryset = shop.item.filter(is_deleted=False, name__icontains=name_filter)
+        else:
+            queryset = shop.item.filter(is_deleted=False)
+
+        return queryset
 
 
 class ShopDebtorView(generics.ListAPIView):

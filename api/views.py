@@ -371,9 +371,9 @@ class RemoveDebtorView(generics.RetrieveUpdateAPIView):
 class ShopItemsView(generics.ListAPIView):
     serializer_class = ItemSerializer
     #permission_classes = (IsAuthenticated,)
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['name','buy_price', 'sell_price','quantity','weight','category','creation_date']
-
+    filter_backends = [SearchFilter,DjangoFilterBackend]
+    filterset_fields = ['name','buy_price', 'sell_price','quantity','weight','category','creation_date','measure']
+    search_fields = ['name']
     def get_queryset(self):
         shop_id = self.kwargs['shop_id']
         shop_exists = Shop.objects.filter(id=shop_id).exists()
@@ -381,20 +381,15 @@ class ShopItemsView(generics.ListAPIView):
             return None
 
         shop = Shop.objects.get(id=shop_id)
-        name_filter = self.request.query_params.get('name', None)
-        if name_filter:
-            queryset = shop.item.filter(is_deleted=False, name__icontains=name_filter)
-        else:
-            queryset = shop.item.filter(is_deleted=False)
-
-        return queryset
+        return shop.item.filter(is_deleted=False)
 
 
 class ShopDebtorView(generics.ListAPIView):
     serializer_class = DebtorSerializer
     #permission_classes = (IsAuthenticated,)
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [SearchFilter,DjangoFilterBackend]
     filterset_fields = ['name','creation_date']
+    search_fields = ['name']
 
     def get_queryset(self):
         shop_id = self.kwargs['shop_id']
@@ -409,8 +404,9 @@ class ShopDebtorView(generics.ListAPIView):
 class ShopSupplierView(generics.ListAPIView):
     serializer_class = SupplierSerializer
     #permission_classes = (IsAuthenticated,)
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [SearchFilter,DjangoFilterBackend]
     filterset_fields = ['name','creation_date']
+    search_fields = ['name']
 
     def get_queryset(self):
         shop_id = self.kwargs['shop_id']
@@ -420,6 +416,7 @@ class ShopSupplierView(generics.ListAPIView):
 
         shop = Shop.objects.get(id=shop_id)
         return shop.supplier.filter(is_deleted=False)
+
 
 class ShopFinancesView(generics.ListAPIView):
     serializer_class = ShopFinancesSerializer

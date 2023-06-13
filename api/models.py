@@ -150,6 +150,12 @@ class Item(GenericAttributes):
         ('limpieza', 'Limpieza'),
         ('mascotas', 'Mascotas')
     ]
+
+    AVAILABLE_TYPE = [
+        ('unit', 'Unidad'),
+        ('gram', 'Gramos')
+    ]
+    measure = models.TextField(**common_args, choices=AVAILABLE_TYPE, default='unit')
     category = models.TextField(**common_args, choices=AVAILABLE_CATEGORY, default='despensa')
     name = models.TextField(**common_args)
     buy_price = models.IntegerField(**common_args, default=0)
@@ -164,7 +170,7 @@ class Item(GenericAttributes):
 #tabla para suponer una venta y poder tener registro de lo que se "vendio"
 class ShopItemSold(GenericAttributes):
     shop_id = models.ForeignKey(Shop, on_delete=models.CASCADE, **common_args, related_name='shopitemsold')
-    item_id = models.OneToOneField(Item, on_delete=models.CASCADE, **common_args, related_name='shopitemsold')
+    item_id = models.ForeignKey(Item, on_delete=models.CASCADE, **common_args, related_name='shopitemsold')
     total_sold = models.IntegerField(**common_args, default=0)  # atributo para tener un registro de la venta
     quantity_sold = models.IntegerField(**common_args, default=0) # la catidad sera por unidad
     weight_sold = models.IntegerField(**common_args, default=0) # peso se medira en gramos

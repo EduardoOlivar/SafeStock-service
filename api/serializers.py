@@ -357,16 +357,14 @@ class SellItemSerializer(serializers.ModelSerializer):
         model = Item
         exclude = [*generic_fields]
 
-    def update(self, instance, validated_data):
+    def update(self, instance:Item, validated_data):
         request = self.context.get('request')
-        quantity_sold = validated_data.get('quantity_sold')
-        weight_sold = validated_data.get('weight_sold')
+        quantity_sold = validated_data.get('quantity')
+        weight_sold = validated_data.get('weight')
+        shop_id = validated_data.get('shop_id')
+        measure = validated_data.get('measure')
 
-        # Verificar si se especificó tanto la cantidad vendida como el peso vendido
-        if quantity_sold is not None and weight_sold is not None:
-            raise serializers.ValidationError('Debes especificar la cantidad vendida o el peso vendido, no ambos.')
-
-        if quantity_sold is not None:
+        if measure == 'unit':
             if quantity_sold <= 0: # Validar que la cantidad vendida sea mayor que cero
                 raise serializers.ValidationError('La cantidad vendida debe ser mayor que cero.')
             if quantity_sold > instance.quantity:# Validar si hay suficiente stock disponible para realizar la venta
@@ -374,8 +372,8 @@ class SellItemSerializer(serializers.ModelSerializer):
             sold_price = quantity_sold * instance.sell_price
             # Crea un nuevo registro en ShopItems para la venta por cantidad
             shop_item = ShopItemSold.objects.create(
-                shop_id=request.user.shop.id,
-                item_id=instance.id,
+                shop_id=shop_id,
+                item_id=instance,
                 total_sold=sold_price,
                 quantity_sold=quantity_sold,
                 weight_sold=0  # No se considera el peso vendido en caso de venta por cantidad
@@ -383,7 +381,7 @@ class SellItemSerializer(serializers.ModelSerializer):
             instance.quantity -= quantity_sold
             instance.save()
 
-        elif weight_sold is not None:
+        elif measure == 'gram':
             if weight_sold <= 0: #Valida que el peso vendido sea mayor que cero
                 raise serializers.ValidationError('El peso vendido debe ser mayor que cero.')
             if weight_sold > instance.weight:# Validar si hay suficiente peso disponible para realizar la venta
@@ -391,8 +389,8 @@ class SellItemSerializer(serializers.ModelSerializer):
             # Crea un nuevo registro en ShopItems para la venta por peso
             sold_price = (weight_sold/1000) * instance.sell_price # total de la venta
             shop_item = ShopItemSold.objects.create(
-                shop_id=request.user.shop.id,
-                item_id=instance.id,
+                shop_id=shop_id,
+                item_id=instance,
                 total_sold=round(sold_price),
                 quantity_sold=0,  # No se considera la cantidad vendida en caso de venta por peso
                 weight_sold=weight_sold

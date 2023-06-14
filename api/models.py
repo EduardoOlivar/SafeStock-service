@@ -177,13 +177,21 @@ class ShopItemSold(GenericAttributes):
     date = models.DateTimeField(**common_args, auto_now=True)
 
 
-#tabla para guardar el registro de los items que el usuario fio
-class DebtorItemSold(GenericAttributes):
-    debtors_id = models.ForeignKey(Debtor, on_delete=models.CASCADE, **common_args, related_name='interdebtors')
-    items_id = models.ForeignKey(Item, on_delete=models.CASCADE, **common_args, related_name='interitems')
-    quantity_debtor = models.FloatField(**common_args)
-    weight_debtor = models.FloatField(**common_args)
-    total_debtor = models.FloatField(**common_args)
+#tabla para la boleta
+class BillDebtor(GenericAttributes):
+    debtors_id = models.ForeignKey(Debtor, on_delete=models.CASCADE, **common_args, related_name='bill')
+    total_bill = models.IntegerField(**common_args, default=0)
     is_paid = models.BooleanField(default=False)
+    items = models.ManyToManyField(Item, blank=True ,through='BillItem', related_name='bills')
+
+
+#tabla para guardar el registro de los items que el usuario fio
+class BillItem(GenericAttributes):
+    bill_id = models.ForeignKey(BillDebtor, on_delete=models.CASCADE, **common_args, related_name='billitem')
+    items_id = models.ForeignKey(Item, on_delete=models.CASCADE, **common_args, related_name='billitem')
+    quantity_debtor = models.IntegerField(**common_args)
+    weight_debtor = models.IntegerField(**common_args)
+    current_price = models.IntegerField(**common_args) #precio en el momento en que se fiaron los item
+
 
 

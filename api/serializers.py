@@ -257,6 +257,8 @@ class SupplierSerializer(serializers.ModelSerializer):
     # Serializador para Debtor
 class DebtorSerializer(serializers.ModelSerializer):
     creation_date = serializers.SerializerMethodField()
+    name = serializers.CharField(max_length=255,required=True)
+    shop = serializers.PrimaryKeyRelatedField(queryset=Shop.objects.filter(is_deleted=False))
 
     def get_creation_date(self, instance):
         return int(instance.creation_date.timestamp())
@@ -266,6 +268,12 @@ class DebtorSerializer(serializers.ModelSerializer):
         exclude = ['last_update','is_deleted']
 
 
+    def create(self, validated_data):
+        shop = validated_data.pop('shop')
+        print(shop)
+        shop_id = shop.id
+        debtor = Debtor.objects.create(shop_id=shop_id, **validated_data)
+        return debtor
 
 # Serializador para Item
 class ItemSerializer(serializers.ModelSerializer):
@@ -278,16 +286,37 @@ class ItemSerializer(serializers.ModelSerializer):
         exclude = ['last_update','is_deleted','item_sold']
 
 
+#serializador de boleta
+class BillDebtorSerializer(serializers.ModelSerializer):
+    debtors_id = serializers.PrimaryKeyRelatedField(queryset=Debtor.objects.filter(is_deleted=False))
+    creation_date = serializers.SerializerMethodField()
 
-
-
-
-# Serializador para UserDebtorItems
-class DebtorItemsSerializer(serializers.ModelSerializer):
+    def get_creation_date(self, instance):
+        return int(instance.creation_date.timestamp())
 
     class Meta:
-        model = DebtorItemSold
-        exclude = [*generic_fields]
+        model = BillDebtor
+        exclude = ['last_update', 'is_deleted']
+
+    def create(self, validated_data):
+        debtor_id = validated_data.pop('debtors_id')
+        debtor = Debtor.objects.get(id=debtor_id)
+        bill_debtor = BillDebtor.objects.create(debtors_id=debtor, **validated_data)
+        return bill_debtor
+
+
+#serializador para mostrar la cantidad de items de la boleta
+class BillItemSerializer(serializers.ModelSerializer):
+    creation_date = serializers.SerializerMethodField()
+
+    def get_creation_date(self, instance):
+        return int(instance.creation_date.timestamp())
+
+    class Meta:
+        model = BillItem
+        exclude = ['last_update','is_deleted']
+
+
 
 
 # serializador para eliminar de manera logica un proveedor
@@ -400,53 +429,93 @@ class SellItemSerializer(serializers.ModelSerializer):
         return instance
 
 
-class SellDebtorItemSerializer(serializers.ModelSerializer):
+#serializador para la lista de objetos
+class SellItemListSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    quantity_sold = serializers.IntegerField(default=0)
+    weight_sold = serializers.IntegerField(default=0)
+
+
+    # serializador para asignar items a una boleta
+class SellItemsDebtorBill(serializers.ModelSerializer):
+    items = SellItemListSerializer(many=True)
+
     class Meta:
-        model = DebtorItemSold
+        model = BillDebtor
         exclude = [*generic_fields]
 
-    def create(self, validated_data):
-        items_data = self.context['request'].data['items']
-        debtor = validated_data['debtors_id']
-        debtor_items = []
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation.pop('items', None)
+        return representation
 
-        for item_data in items_data: #se recorren los productos o el producto
-            item = Item.objects.get(id=item_data['id']) #se busca el producto en la bd
-            quantity_debtor = item_data['quantity_debtor'] #se pasa la cantidad de un producto
-            weight_debtor = item_data['weight_debtor'] #se pasa el peso de un producto
-            total_debtor = quantity_debtor * item.sell_price if quantity_debtor else weight_debtor * item.sell_price #calcula el total adeudado de forma dinámica dependiendo de si se vendió por cantidad o por peso.
+    def update(self, instance, validated_data):
 
-            if quantity_debtor and quantity_debtor > item.quantity: #validacion para el stock
-                raise serializers.ValidationError('No hay suficiente stock disponible para realizar la venta del item.')
+        try:
+            items_data = validated_data['items']
+            current_price = 0
 
-            if weight_debtor and weight_debtor > item.weight:#validacion para el stock
-                raise serializers.ValidationError('No hay suficiente peso disponible para realizar la venta del item.')
+            for item_data in items_data:
+                item_id = item_data['id']
+                print(item_id)
+                quantity_sold = item_data['quantity_sold']
+                weight_sold = item_data['weight_sold']
+                item = Item.objects.get(pk=item_id)
+                if item.measure == 'unit':
+                    if quantity_sold <= 0:
+                        raise serializers.ValidationError('La cantidad vendida debe ser mayor que cero.')
+                    if quantity_sold > item.quantity:
+                        raise serializers.ValidationError('No hay suficiente stock disponible para realizar la venta.')
 
-            if quantity_debtor: # si es cantidad se decrementa en la tabla de item
-                item.quantity -= quantity_debtor
-            elif weight_debtor: # si es peso se decrementa en la tabla de item
-                item.weight -= weight_debtor
-            item.save() #se guarda
-            #se crea una instancia para guardar los resultados en la tabla DebtorItems
-            debtor_item = DebtorItemSold(
-                debtors_id=debtor,
-                items_id=item,
-                quantity_debtor=quantity_debtor,
-                weight_debtor=weight_debtor,
-                total_debtor=total_debtor,
-                is_paid=False
-            )
-            debtor_items.append(debtor_item)
+                    current_price += quantity_sold * item.sell_price
 
-        DebtorItemSold.objects.bulk_create(debtor_items)
-        return debtor_items
+                    BillItem.objects.create(
+                        bill_id=instance,
+                        items_id=item,
+                        quantity_debtor=quantity_sold,
+                        weight_debtor=0,
+                        current_price=current_price
+                    )
+
+                    item.quantity -= quantity_sold
+                    item.save()
+
+                elif item.measure == 'gram':
+                    if weight_sold <= 0:
+                        raise serializers.ValidationError('El peso vendido debe ser mayor que cero.')
+                    if weight_sold > item.weight:
+                        raise serializers.ValidationError('No hay suficiente peso disponible para realizar la venta.')
+
+                    current_price += (weight_sold / 1000) * item.sell_price
+
+                    BillItem.objects.create(
+                        bill_id=instance,
+                        items_id=item,
+                        quantity_debtor=0,
+                        weight_debtor=weight_sold,
+                        current_price=current_price
+                    )
+
+                    item.weight -= weight_sold
+                    item.save()
+
+            instance.total_bill += current_price
+            instance.save()
+            return instance
+        except instance.DoesNotExist as e:
+            return e
+
+
+
+
+
 
 
 #serializador para el pago de manera logica una deuda
-class PaidDebtorItemsSerializer(serializers.ModelSerializer):
+class PaidBillDebtorSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = DebtorItemSold
+        model = BillDebtor
         exclude = [*generic_fields]
 
     def update(self, instance, validated_data):
@@ -466,3 +535,4 @@ class RemoveDebtorSerializer(serializers.ModelSerializer):
         instance.is_deleted = True #dato para eliminar de manera logica
         instance.save()
         return instance
+

@@ -40,22 +40,21 @@ urlpatterns = [
     # Endpoints para deudores
     re_path(r'^debtors/all/$', views.DebtorListCreate.as_view()),# Endpoint para consultar listado de deudores
     re_path(r'^debtors/(?P<pk>[0-9]+)/$', views.DebtorDetail.as_view()),# Endpoint para consultar, actualizar o eliminar un deudor
+    re_path(r'^shop/(?P<shop_id>[0-9]+)/debtor/all/$', views.ShopDebtorView.as_view()),# Endpoint para mostrar los deudores por tienda
+
+   # Endpoint para la boleta
+    re_path(r'^bill_debtor/$', views.BillDebtorCreateView.as_view()),# Endpoint para crear la boleta
 
     # Endpoints para productos
     re_path(r'^items/all/$', views.ItemListCreate.as_view()),# Endpoint para consultar listado de productos
     re_path(r'^items/(?P<pk>[0-9]+)/$', views.ItemDetail.as_view()),# Endpoint para consultar, actualizar o eliminar un producto
 
 
-    # Endpoints para ítems de deudor de usuario
-    re_path(r'^debtor_items/all/$', views.DebtorItemSoldListCreate.as_view()),# Endpoint para consultar y crear ítems de deudor de usuario
-    re_path(r'^shop/(?P<shop_id>[0-9]+)/debtor/all/$', views.ShopDebtorView.as_view()),# Endpoint para mostrar los deudores por tienda
-    re_path(r'^debtor_items/(?P<pk>[0-9]+)/$', views.DebtorItemSoldDetail.as_view()),# Endpoint para consultar, actualizar o eliminar un ítem de deudor de usuario
-
     # Endpoints para eliminar proveedor, finanza, producto, deuda, deudor
     re_path(r'^remove_supplier/(?P<pk>[0-9]+)/$', views.SupplierRemoveListView.as_view()),# Endpoint para eliminar un proveedor
     re_path(r'^remove_finance/(?P<pk>[0-9]+)/$', views.RemoveShopFinanceView.as_view()),# Endpoint para eliminar una finanza de usuario
     re_path(r'^remove_item/(?P<pk>[0-9]+)/$', views.RemoveItemView.as_view()),# Endpoint para eliminar un producto
-    re_path(r'^paid_debtor_item/(?P<pk>[0-9]+)/$', views.PaidDebtorItemsView.as_view()),# Endpoint para pagar una deuda
+    re_path(r'^paid_bill_debtor/(?P<pk>[0-9]+)/$', views.PaidBillDebtorView.as_view()),# Endpoint para pagar una deuda
     re_path(r'^remove_debtor/(?P<pk>[0-9]+)/$', views.RemoveDebtorView.as_view()),# Endpoint para eliminar una fiado(deudor)
 
     # Endpoints para listas de tiendas
@@ -67,7 +66,7 @@ urlpatterns = [
     re_path(r'^sell_item/(?P<pk>[0-9]+)/$', views.SellItemView.as_view()),  # Endpoint para vender un ítem
 
     # Endpoint para simular venta a un fiado
-    re_path(r'^sell_item_debtor/$', views.DebtorItemsCreateView.as_view()),# Endpoint para simular venta a un fiado
+    re_path(r'^sell_item_debtor/(?P<pk>[0-9]+)/$', views.SellItemDebtorBillView.as_view()),# Endpoint para agregar items a una boleta
 ]
 
 

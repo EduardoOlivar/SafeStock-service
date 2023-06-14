@@ -304,19 +304,39 @@ class BillDebtorSerializer(serializers.ModelSerializer):
         bill_debtor = BillDebtor.objects.create(debtors_id=debtor, **validated_data)
         return bill_debtor
 
-
-#serializador para mostrar la cantidad de items de la boleta
-class BillItemSerializer(serializers.ModelSerializer):
+#serializador de boleta
+class BillDebtorRepliceSerializer(serializers.ModelSerializer):
     creation_date = serializers.SerializerMethodField()
 
     def get_creation_date(self, instance):
         return int(instance.creation_date.timestamp())
 
     class Meta:
+        model = BillDebtor
+        exclude = ['last_update', 'is_deleted','items']
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['name'] = instance.debtors_id.name
+        return data
+
+
+#serializador para mostrar la cantidad de items de la boleta
+class BillItemSerializer(serializers.ModelSerializer):
+    def get_creation_date(self, time):
+        return int(time.timestamp())
+
+    class Meta:
         model = BillItem
-        exclude = ['last_update','is_deleted']
+        exclude = [*generic_fields,'items_id','bill_id']
 
-
+    def to_representation(self, instance:BillItem):
+        data = super().to_representation(instance)
+        data['created_date_bill'] = self.get_creation_date(instance.bill_id.creation_date)
+        data['total_bill'] = instance.bill_id.total_bill
+        data['name_item'] = instance.items_id.name
+        data['measure'] = instance.items_id.measure
+        return data
 
 
 # serializador para eliminar de manera logica un proveedor
@@ -516,7 +536,7 @@ class PaidBillDebtorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BillDebtor
-        exclude = [*generic_fields]
+        exclude = [*generic_fields,'items']
 
     def update(self, instance, validated_data):
         instance.is_paid = True #dato para simular el pago de manera logica

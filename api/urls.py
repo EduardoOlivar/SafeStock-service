@@ -44,6 +44,8 @@ urlpatterns = [
 
    # Endpoint para la boleta
     re_path(r'^bill_debtor/$', views.BillDebtorCreateView.as_view()),# Endpoint para crear la boleta
+    re_path(r'^debtor/(?P<debtors_id>[0-9]+)/bill/all/$', views.BillDebtorView.as_view()),# Endpoint para listar las deudas
+    re_path(r'^bill/(?P<bill_id>[0-9]+)/items/all/$', views.BillItemsDebtorView.as_view()),# Endpoint listar los ites dentro de una deuda
 
     # Endpoints para productos
     re_path(r'^items/all/$', views.ItemListCreate.as_view()),# Endpoint para consultar listado de productos

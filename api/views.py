@@ -13,6 +13,7 @@ from api.models import *
 from rest_framework.permissions import IsAuthenticated
 from django.db import connections
 from django.db.models import Q
+from api.pagination import SmallMediumPagination
 
 # Create your views here.
 
@@ -40,14 +41,14 @@ def get_tokens_for_user(user):
 class UserListCreate(generics.ListCreateAPIView):
     queryset = Users.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = UserSerializer
-    # = (IsAuthenticated,)
-
+    #permission_classes = (IsAuthenticated,)
+    #pagination_class = SmallMediumPagination
 
 class UsersDetail(generics.RetrieveUpdateAPIView):
     queryset = Users.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = UserSerializer
     #permission_classes = (IsAuthenticated,)
-
+    #pagination_class = SmallMediumPagination
 
 class UserProfileView(APIView):
     renderer_classes = [UserRenderer, ]
@@ -144,54 +145,63 @@ class ShopListCreate(generics.ListCreateAPIView):
     queryset = Shop.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = ShopSerializer
     #permission_classes = (IsAuthenticated,)
+    #pagination_class = SmallMediumPagination
 
 
 class ShopDetail(generics.RetrieveUpdateAPIView):
     queryset = Shop.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = ShopSerializer
     #permission_classes = (IsAuthenticated,)
+    #pagination_class = SmallMediumPagination
 
 
 class ReportSettingList(generics.ListAPIView):
     queryset = ReportSettings.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = ReportSettingsSerializer
     #permission_classes = (IsAuthenticated,)
+    #pagination_class = SmallMediumPagination
 
 
 class ReportSettingDetail(generics.RetrieveUpdateAPIView):
     queryset = ReportSettings.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = ReportSettingsSerializer
     #permission_classes = (IsAuthenticated,)
+    #pagination_class = SmallMediumPagination
 
 
 class RecommendationsList(generics.ListAPIView):
     queryset = Recommendations.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = RecommendationsSerializer
     #permission_classes = (IsAuthenticated,)
+    #pagination_class = SmallMediumPagination
 
 
 class RecommendationsDetail(generics.RetrieveUpdateAPIView):
     queryset = Recommendations.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = RecommendationsSerializer
     #permission_classes = (IsAuthenticated,)
+    #pagination_class = SmallMediumPagination
 
 
 class NotificationList(generics.ListAPIView):
     queryset = Notification.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = NotificationSerializer
     #permission_classes = (IsAuthenticated,)
+    #pagination_class = SmallMediumPagination
 
 
 class NotificationDetail(generics.RetrieveUpdateAPIView):
     queryset = Notification.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = NotificationSerializer
     #permission_classes = (IsAuthenticated,)
+    #pagination_class = SmallMediumPagination
 
 
 class UserNotificationDetail(generics.RetrieveUpdateAPIView):
     queryset = UserNotification.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = UserNotificationSerializer
     #permission_classes = (IsAuthenticated,)
+    #pagination_class = SmallMediumPagination
 
 
 # Vista para listar y crear finanzas de usuario.
@@ -202,26 +212,14 @@ class ShopFinancesListCreate(generics.ListCreateAPIView):
     filterset_fields = ['shop_id', 'type', 'total']
     search_fields = ['type', 'total']
     #permission_classes = (IsAuthenticated,)
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        #Obtiene los parametros de busqueda de la URL
-        finance_type = self.request.query_params.get('finance_type', None)
-        total_min = self.request.query_params.get('total_min', None)
-        total_max = self.request.query_params.get('total_max', None)
-        if finance_type:
-            queryset = queryset.filter(type=finance_type)#Filtra las finanzas por tipo.
-        if total_min:
-            queryset = queryset.filter(total__gte=total_min) #Filtra las finanzas por un valor minimo de total.
-        if total_max:
-            queryset = queryset.filter(total__lte=total_max)#Filtra las finanzas por un valor maximo de total.
-        return queryset
+    #pagination_class = SmallMediumPagination
 
 
 class ShopFinancesDetail(generics.RetrieveUpdateAPIView):
     queryset = ShopFinances.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = ShopFinancesSerializer
     #permission_classes = (IsAuthenticated,)
+    #pagination_class = SmallMediumPagination
 
 
 class SupplierListCreate(generics.ListCreateAPIView):
@@ -230,19 +228,14 @@ class SupplierListCreate(generics.ListCreateAPIView):
     filter_backends = [SearchFilter]
     search_fields = ['name']
     #permission_classes = (IsAuthenticated,)
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        search_query = self.request.query_params.get('search', None)
-        if search_query:
-            queryset = queryset.filter(name__icontains=search_query)
-        return queryset
+    #pagination_class = SmallMediumPagination
 
 
 class SupplierDetail(generics.RetrieveUpdateAPIView):
     queryset = Supplier.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = SupplierSerializer
     #permission_classes = (IsAuthenticated,)
+    #pagination_class = SmallMediumPagination
 
 
 class DebtorListCreate(generics.ListCreateAPIView):
@@ -251,12 +244,32 @@ class DebtorListCreate(generics.ListCreateAPIView):
     filter_backends = [SearchFilter]
     search_fields = ['name']
     #permission_classes = (IsAuthenticated,)
+    #pagination_class = SmallMediumPagination
 
 
+#vista para el detalle de un deudor
 class DebtorDetail(generics.RetrieveUpdateAPIView):
     queryset = Debtor.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = DebtorSerializer
     #permission_classes = (IsAuthenticated,)
+    #pagination_class = SmallMediumPagination
+
+
+#vista para crear la boleta
+class BillDebtorCreateView(generics.CreateAPIView):
+    serializer_class = BillDebtorSerializer
+    # permission_classes = (IsAuthenticated,)
+    #pagination_class = SmallMediumPagination
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        bill_debtor = serializer.save(debtors_id=request.data.get('debtors_id'))
+
+        response_data = {
+            'bill_debtor_id': bill_debtor.id
+        }
+        return Response(response_data, status=status.HTTP_201_CREATED)
 
 
 # View para listar y crear ítems.
@@ -267,6 +280,7 @@ class ItemListCreate(generics.ListCreateAPIView):
     filterset_fields = ['shop_id']
     search_fields = ['name', 'buy_price', 'sell_price']
     #permission_classes = (IsAuthenticated,)
+    #pagination_class = SmallMediumPagination
 
 
 # View para obtener detalles y actualizar un ítem específico.
@@ -274,21 +288,7 @@ class ItemDetail(generics.RetrieveUpdateAPIView):
     queryset = Item.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = ItemSerializer
     #permission_classes = (IsAuthenticated,)
-
-
-
-# View para listar y crear ítems de deudor de usuario.
-class DebtorItemSoldListCreate(generics.ListAPIView):
-    queryset = DebtorItemSold.objects.filter(is_deleted=False).order_by('pk')
-    serializer_class = DebtorItemsSerializer
-    #permission_classes = (IsAuthenticated,)
-
-
-# View para obtener detalles y actualizar un ítem de deudor de usuario específico.
-class DebtorItemSoldDetail(generics.RetrieveUpdateAPIView):
-    queryset = DebtorItemSold.objects.filter(is_deleted=False).order_by('pk')
-    serializer_class = DebtorItemsSerializer
-    #permission_classes = (IsAuthenticated,)
+    #pagination_class = SmallMediumPagination
 
 
 # View para eliminado logico.
@@ -296,6 +296,7 @@ class SupplierRemoveListView(generics.RetrieveUpdateAPIView):
     queryset = Supplier.objects.filter(is_deleted=False)
     serializer_class = RemoveSupplierSerializer
     # permission_classes = (IsAuthenticated,)
+    #pagination_class = SmallMediumPagination
 
 
 # View para eliminado logico.
@@ -303,37 +304,31 @@ class RemoveShopFinanceView(generics.RetrieveUpdateAPIView):
     queryset = ShopFinances.objects.filter(is_deleted=False)
     serializer_class = RemoveShopFinanceSerializer
     #permission_classes = (IsAuthenticated,)
+    #pagination_class = SmallMediumPagination
 
 
 # View para listar tiendas con capacidad de búsqueda.
 class ShopListView(generics.ListAPIView):
+    queryset = Shop.objects.filter(is_deleted=False)
     serializer_class = ShopListSerializer
-    #permission_classes = (IsAuthenticated,)
-
-    def get_queryset(self):
-        queryset = Shop.objects.filter(is_deleted=False) #Obtiene todas las tiendas que no han sido eliminadas.
-        search_query = self.request.query_params.get('search', None)#Obtiene el parametro de busqueda de la URL.
-        if search_query:
-            # Filtra las tiendas por nombre o dirección que coincidan con el criterio de busqueda.
-            queryset = queryset.filter(
-                Q(name__icontains=search_query) |
-                Q(address__icontains=search_query)
-            )
-
-        return queryset
+    filter_backends = [SearchFilter]
+    search_fields = ['name']
+    #pagination_class = SmallMediumPagination
 
 
 # View para obtener detalles de una tienda específica.
 class ShopDetailView(generics.RetrieveAPIView):
     queryset = Shop.objects.filter(is_deleted=False)
     serializer_class = ShopProfileSerializer
-    #permission_classes = (IsAuthenticated,)
+    #pagination_class = SmallMediumPagination
+
 
 # View para eliminado logico.
 class RemoveItemView(generics.RetrieveUpdateAPIView):
     queryset = Item.objects.filter(is_deleted=False)
     serializer_class = RemoveItemSerializer
     #permission_classes = (IsAuthenticated,)
+    #pagination_class = SmallMediumPagination
 
 
 #view para vender productos
@@ -341,39 +336,44 @@ class SellItemView(generics.UpdateAPIView):
     queryset = Item.objects.filter(is_deleted=False)
     serializer_class = SellItemSerializer
     # permission_classes = (IsAuthenticated,)
+    #pagination_class = SmallMediumPagination
 
 
-#view para vender a fiados
-class DebtorItemsCreateView(generics.ListCreateAPIView):
-    serializer_class = SellDebtorItemSerializer
+#view para agregar items a una boleta
+class SellItemDebtorBillView(generics.UpdateAPIView):
+    queryset = BillDebtor.objects.all()
+    serializer_class = SellItemsDebtorBill
+    lookup_field = 'pk'
     # permission_classes = (IsAuthenticated,)
-
-    def get_queryset(self):
-        queryset = DebtorItemSold.objects.filter(is_deleted=False)
-        search_query = self.request.query_params.get('search', None)# Obtiene el parámetro de busqueda que le llega a la peticion
-        if search_query:
-            queryset = queryset.filter(items_id__name__icontains=search_query)# Filtra los registros por el nombre del producto
-        return queryset
+    #pagination_class = SmallMediumPagination
 
 
-class PaidDebtorItemsView(generics.RetrieveUpdateAPIView):
-    queryset = DebtorItemSold.objects.filter(is_deleted=False)
-    serializer_class = PaidDebtorItemsSerializer
+
+#view para pagar la deuda
+class PaidBillDebtorView(generics.RetrieveUpdateAPIView):
+    queryset = BillDebtor.objects.filter(is_deleted=False)
+    serializer_class = PaidBillDebtorSerializer
     #permission_classes = (IsAuthenticated,)
+    #pagination_class = SmallMediumPagination
 
 
+#vista para eliminar un deudor
 class RemoveDebtorView(generics.RetrieveUpdateAPIView):
     queryset = Debtor.objects.filter(is_deleted=False)
     serializer_class = RemoveDebtorSerializer
     #permission_classes = (IsAuthenticated,)
+    #pagination_class = SmallMediumPagination
 
 
+#vista para los productos de una shop
 class ShopItemsView(generics.ListAPIView):
     serializer_class = ItemSerializer
     #permission_classes = (IsAuthenticated,)
     filter_backends = [SearchFilter,DjangoFilterBackend]
     filterset_fields = ['name','buy_price', 'sell_price','quantity','weight','category','creation_date','measure']
     search_fields = ['name']
+    #pagination_class = SmallMediumPagination
+
     def get_queryset(self):
         shop_id = self.kwargs['shop_id']
         shop_exists = Shop.objects.filter(id=shop_id).exists()
@@ -384,12 +384,14 @@ class ShopItemsView(generics.ListAPIView):
         return shop.item.filter(is_deleted=False)
 
 
+#vista para los deudores de una shop
 class ShopDebtorView(generics.ListAPIView):
     serializer_class = DebtorSerializer
     #permission_classes = (IsAuthenticated,)
     filter_backends = [SearchFilter,DjangoFilterBackend]
     filterset_fields = ['name','creation_date']
     search_fields = ['name']
+    #pagination_class = SmallMediumPagination
 
     def get_queryset(self):
         shop_id = self.kwargs['shop_id']
@@ -401,12 +403,14 @@ class ShopDebtorView(generics.ListAPIView):
         return shop.debtor.filter(is_deleted=False)
 
 
+#vista para los proveedores de una shop
 class ShopSupplierView(generics.ListAPIView):
     serializer_class = SupplierSerializer
     #permission_classes = (IsAuthenticated,)
     filter_backends = [SearchFilter,DjangoFilterBackend]
     filterset_fields = ['name','creation_date']
     search_fields = ['name']
+    #pagination_class = SmallMediumPagination
 
     def get_queryset(self):
         shop_id = self.kwargs['shop_id']
@@ -418,11 +422,13 @@ class ShopSupplierView(generics.ListAPIView):
         return shop.supplier.filter(is_deleted=False)
 
 
+#vista para las finanzas de una shop
 class ShopFinancesView(generics.ListAPIView):
     serializer_class = ShopFinancesSerializer
     #permission_classes = (IsAuthenticated,)
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['type','total','creation_date']
+    #pagination_class = SmallMediumPagination
 
     def get_queryset(self):
         shop_id = self.kwargs['shop_id']

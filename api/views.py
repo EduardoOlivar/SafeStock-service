@@ -258,7 +258,7 @@ class DebtorDetail(generics.RetrieveUpdateAPIView):
 #vista para crear la boleta
 class BillDebtorCreateView(generics.CreateAPIView):
     serializer_class = BillDebtorSerializer
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     #pagination_class = SmallMediumPagination
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -295,7 +295,7 @@ class ItemDetail(generics.RetrieveUpdateAPIView):
 class SupplierRemoveListView(generics.RetrieveUpdateAPIView):
     queryset = Supplier.objects.filter(is_deleted=False)
     serializer_class = RemoveSupplierSerializer
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     #pagination_class = SmallMediumPagination
 
 
@@ -335,7 +335,7 @@ class RemoveItemView(generics.RetrieveUpdateAPIView):
 class SellItemView(generics.UpdateAPIView):
     queryset = Item.objects.filter(is_deleted=False)
     serializer_class = SellItemSerializer
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     #pagination_class = SmallMediumPagination
 
 
@@ -344,7 +344,7 @@ class SellItemDebtorBillView(generics.UpdateAPIView):
     queryset = BillDebtor.objects.all()
     serializer_class = SellItemsDebtorBill
     lookup_field = 'pk'
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     #pagination_class = SmallMediumPagination
 
 

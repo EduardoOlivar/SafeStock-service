@@ -144,7 +144,7 @@ class UserPasswordResetView(APIView):
 class ShopListCreate(generics.ListCreateAPIView):
     queryset = Shop.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = ShopSerializer
-    permission_classes = (IsAuthenticated,)
+    #permission_classes = (IsAuthenticated,)
     #pagination_class = SmallMediumPagination
 
 

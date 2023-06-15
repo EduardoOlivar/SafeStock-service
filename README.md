@@ -1,8 +1,20 @@
-# Proyecto de titulo
+# Proyecto de título
 # José Olivar / Jean Rodriguez
 
-Para iniciar el backend es necesario recrear ciertos pasos previamente en su IDE.
-Primero clonar la repo, luego en la carpeta que se descarga, se abre con el IDE, y tiene escribir los siguientes comandos en la terminal
+## Requisitos
+
+1. Tener python3 instalado
+2. Tener MySQL version 8.0.30 o superior
+3. MySQL Workbench para correr localmente la base de datos
+4. Tener VSC o Pycharm
+
+### Clonar el repositorio
+
+Primero clonar el repositorio
+
+### Configuración del entorno virtual
+
+Segundo abrir la terminal y escribir el siguiente comando:
 
 ```py -m venv venv```
 

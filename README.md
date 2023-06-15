@@ -1,4 +1,4 @@
-# Proyecto de título
+# SafeStock: Backend de proyecto de título
 # José Olivar / Jean Rodriguez
 
 ## Requisitos

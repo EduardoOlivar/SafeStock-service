@@ -473,14 +473,16 @@ class SellItemsDebtorBill(serializers.ModelSerializer):
 
         try:
             items_data = validated_data['items']
-            current_price = 0
 
             for item_data in items_data:
+                current_price = 0
                 item_id = item_data['id']
-                print(item_id)
                 quantity_sold = item_data['quantity_sold']
                 weight_sold = item_data['weight_sold']
                 item = Item.objects.get(pk=item_id)
+
+
+
                 if item.measure == 'unit':
                     if quantity_sold <= 0:
                         raise serializers.ValidationError('La cantidad vendida debe ser mayor que cero.')
@@ -518,16 +520,12 @@ class SellItemsDebtorBill(serializers.ModelSerializer):
 
                     item.weight -= weight_sold
                     item.save()
+                instance.total_bill += current_price
 
-            instance.total_bill += current_price
             instance.save()
             return instance
         except instance.DoesNotExist as e:
             return e
-
-
-
-
 
 
 

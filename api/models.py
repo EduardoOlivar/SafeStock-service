@@ -119,7 +119,7 @@ class ShopFinances(GenericAttributes):
     shop_id = models.ForeignKey(Shop, on_delete=models.CASCADE, **common_args, related_name='shopfinances')
     type = models.TextField(**common_args, choices=AVAILABLE_FINANCE_TYPE, default='profit')
     details = models.TextField(**common_args)
-    total = models.FloatField(**common_args)
+    total = models.IntegerField(**common_args)
 
 
 

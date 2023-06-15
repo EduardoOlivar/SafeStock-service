@@ -404,16 +404,15 @@ class RemoveItemSerializer(serializers.ModelSerializer):
 class SellItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
-        exclude = [*generic_fields]
+        exclude = [*generic_fields, 'item_sold']
 
     def update(self, instance:Item, validated_data):
         request = self.context.get('request')
         quantity_sold = validated_data.get('quantity')
         weight_sold = validated_data.get('weight')
         shop_id = validated_data.get('shop_id')
-        measure = validated_data.get('measure')
 
-        if measure == 'unit':
+        if instance.measure == 'unit':
             if quantity_sold <= 0: # Validar que la cantidad vendida sea mayor que cero
                 raise serializers.ValidationError('La cantidad vendida debe ser mayor que cero.')
             if quantity_sold > instance.quantity:# Validar si hay suficiente stock disponible para realizar la venta
@@ -430,7 +429,7 @@ class SellItemSerializer(serializers.ModelSerializer):
             instance.quantity -= quantity_sold
             instance.save()
 
-        elif measure == 'gram':
+        elif instance.measure == 'gram':
             if weight_sold <= 0: #Valida que el peso vendido sea mayor que cero
                 raise serializers.ValidationError('El peso vendido debe ser mayor que cero.')
             if weight_sold > instance.weight:# Validar si hay suficiente peso disponible para realizar la venta

@@ -6,6 +6,7 @@ from rest_framework import status
 from api.models import *
 from rest_framework.response import Response
 from datetime import datetime, timedelta
+import pytz
 
 # Create your views here.
 
@@ -23,7 +24,7 @@ class GenericDashBoard(APIView):
         return shop
 
     def timestamp_to_datetime(self,timestamp):
-        return datetime.fromtimestamp(timestamp)
+        return datetime.utcfromtimestamp(timestamp)
 
 
 class ReportShopAllItemView(GenericDashBoard):
@@ -34,8 +35,9 @@ class ReportShopAllItemView(GenericDashBoard):
             return shop
 
         start_timestamp = request.GET.get('start')
-        end_timestamp = request.GET.get('end')
 
+        end_timestamp = request.GET.get('end')
+        print(start_timestamp, end_timestamp)
         if not start_timestamp or not end_timestamp:
             return Response({'error': 'Debe proporcionar los valores de start y end.'}, status=400)
 
@@ -47,7 +49,7 @@ class ReportShopAllItemView(GenericDashBoard):
 
         start_datetime = self.timestamp_to_datetime(start_timestamp)
         end_datetime = self.timestamp_to_datetime(end_timestamp)
-
+        print(start_datetime, end_datetime)
         if start_datetime is None or end_datetime is None:
             return Response({'error': 'Los valores de start y end no son válidos.'}, status=400)
 

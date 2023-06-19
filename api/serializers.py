@@ -154,7 +154,7 @@ class SendPasswordResetEmailSerializer(serializers.Serializer):
             user = Users.objects.get(email=email) # se trae el email de la bd
             uid = urlsafe_base64_encode(force_bytes(user.id)) #encode para seguridad en el token que se le asignara al usuario
             token = PasswordResetTokenGenerator().make_token(user) # se le genera un token al usuario para mandar el email
-            link = 'http://localhost:3000/api/user/reset/'+uid+'/'+token # link generado
+            link = 'http://localhost:3000/recover/user?uid='+uid+'&token='+token # link generado
             subject = 'Reinicia tu contraseña'
             message = f'Presiona el siguiente link para reiniciar tu contraseña: {link}/'
             from_email = EMAIL_HOST_USER
@@ -369,7 +369,7 @@ class RemoveShopFinanceSerializer(serializers.ModelSerializer):
 class ShopListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shop
-        fields = ['name', 'image_file', 'address']
+        fields = ['id','name', 'image_file', 'address']
 
 
 #serializador para el perfil de la tienda
@@ -382,8 +382,8 @@ class ShopProfileSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance: Shop): #atributos extra de otras tablas
         data = super().to_representation(instance)
-        data['username'] = instance.user.username
-        data['phone_number'] = instance.user.phone_number
+        data['username'] = instance.user_id.username
+        data['phone_number'] = instance.user_id.phone_number
         return data
 
 

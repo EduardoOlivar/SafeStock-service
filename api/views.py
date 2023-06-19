@@ -320,6 +320,8 @@ class ShopListView(generics.ListAPIView):
 class ShopDetailView(generics.RetrieveAPIView):
     queryset = Shop.objects.filter(is_deleted=False)
     serializer_class = ShopProfileSerializer
+    filter_backends = [SearchFilter]
+    search_fields = ['name','items__name']
     #pagination_class = SmallMediumPagination
 
 
@@ -372,7 +374,7 @@ class ShopItemsView(generics.ListAPIView):
     filter_backends = [SearchFilter,DjangoFilterBackend]
     filterset_fields = ['name','buy_price', 'sell_price','quantity','weight','category','creation_date','measure']
     search_fields = ['name']
-    #pagination_class = SmallMediumPagination
+    pagination_class = SmallMediumPagination
 
     def get_queryset(self):
         shop_id = self.kwargs['shop_id']

@@ -446,11 +446,11 @@ class ShopFinancesView(generics.ListAPIView):
 #vista para listar las deudas de un fiado de una shop
 class BillDebtorView(generics.ListAPIView):
     serializer_class = BillDebtorRepliceSerializer
-    #permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     filter_backends = [SearchFilter,DjangoFilterBackend]
     filterset_fields = ['total_bill']
     search_field = ['total_bill']
-    pagination_class = SmallMediumPagination
+    #pagination_class = SmallMediumPagination
 
     def get_queryset(self):
         debtors_id = self.kwargs['debtors_id']
@@ -465,8 +465,8 @@ class BillDebtorView(generics.ListAPIView):
 #vista para listar los productos de una deuda de un fiado de una shop
 class BillItemsDebtorView(generics.ListAPIView):
     serializer_class = BillItemSerializer
-    #permission_classes = (IsAuthenticated,)
-    pagination_class = SmallMediumPagination
+    permission_classes = (IsAuthenticated,)
+    #pagination_class = SmallMediumPagination
 
     def get_queryset(self):
         bill_id = self.kwargs['bill_id']

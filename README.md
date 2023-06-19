@@ -1,19 +1,45 @@
-Para iniciar el backend es necesario recrear ciertos pasos previamente en su IDE.
-Primero clonar la repo, luego en la carpeta que se descarga, se abre con el IDE, y tiene escribir los siguientes comandos en la terminal
+# SafeStock: Backend de proyecto de título
+# José Olivar / Jean Rodríguez
+
+## Requisitos
+
+1. Tener python3 instalado
+2. Tener MySQL versión 8.0.30 o superior
+3. MySQL Workbench para correr localmente la base de datos
+4. Tener VSC o Pycharm
+
+### Clonar el repositorio
+
+Primero clonar el repositorio
+
+### Configuración del entorno virtual
+
+Segundo abrir la terminal y escribir el siguiente comando:
 
 ```py -m venv venv```
 
 Si usa VSC apretar f1 y escribir "interpreter, escoger la opción Python 3.10.x ('venv':venv), luego cerrar la consola y volver a abrir la terminal en command prompt (CMD)
 
-Si ocupa PyCharm debe ver que su interprete sea seleccionado en su version de Python3 y tambien utilizar command prompt (cmd).
+Si ocupa PyCharm debe ver que su interprete sea seleccionado en su versión de Python3 y también utilizar command prompt (cmd).
 
-Siguiendo este paso escribir el siguiente comando para instalar las depencencias desde el archivo requirements.txt
+Debe aparecer en paréntesis (venv) al costado izquierdo de la ruta en la terminal para seguir.
+
+### Instalación de dependencias
+
+Para instalar las dependencias desde el archivo requirements.txt escriba el siguiente comando:
 
 ```pip install -r requirements.txt```
 
-Luego que se instalen las depencencias, es necesario tener MySQL Workbench  y MySQL Server en su version 8.0.30 o superior, para poder crear el esquema de la base de datos.
 
-En settings.py que esta dentro de la carpeta backend se debe encontrar esta parte
+### Configuración de la base de datos
+
+Luego que se instalen las dependencias, es necesario tener MySQL Workbench  y MySQL Server en su versión 8.0.30 o superior, para poder crear el esquema de la base de datos.
+
+Crear un usuario por defecto (root) con una contraseña de su elección.
+
+Abre el archivo `settings.py` ubicado en la carpeta "backend".
+
+Se debe encontrar con este apartado
 
 ```python
    DATABASES = {
@@ -32,12 +58,17 @@ Aquí debe incluir la contraseña de su base de datos en la key
 
 ```'PASSWORD': 'Aquí poner su contraseña'``` 
 
-Cuando ya se tenga la contraseña, en MySQL Workbench debe crear un schema con este nombre "safe_stock", al tener creado el esquema, debe ir a su IDE y escribir el siguiente comando
+Cuando ya se tenga la contraseña, en MySQL Workbench debe crear un schema con este nombre "safe_stock".
+
+### Migraciones y ejecución del servidor
+
+Luego de la creación del esquema, en la terminal escribir el siguiente comando.
 
 ```py manage.py migrate```
 
-Este comando creara la base de datos con sus tablas a traves del ORM de Django.
+Este comando creara la base de datos con sus tablas a través del ORM de Django.
 
-Luego de esto escribir el siguiente comando para inicializar el servidor.
+Inicia el servidor ejecutando el siguiente comando en la terminal:
 
 ```py manage.py runserver```
+

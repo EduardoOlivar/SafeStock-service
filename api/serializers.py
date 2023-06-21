@@ -371,6 +371,12 @@ class ShopListSerializer(serializers.ModelSerializer):
         model = Shop
         fields = ['id','name', 'image_file', 'address']
 
+    def to_representation(self, instance: Shop):
+        data = super().to_representation(instance)
+        data['username'] = instance.user_id.username
+        data['phone_number'] = instance.user_id.phone_number
+        return data
+
 
 #serializador para el perfil de la tienda
 class ShopProfileSerializer(serializers.ModelSerializer):

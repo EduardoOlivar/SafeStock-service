@@ -145,7 +145,7 @@ class ShopListCreate(generics.ListCreateAPIView):
     queryset = Shop.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = ShopSerializer
     #permission_classes = (IsAuthenticated,)
-    #pagination_class = SmallMediumPagination
+    pagination_class = SmallMediumPagination
 
 
 class ShopDetail(generics.RetrieveUpdateAPIView):
@@ -313,7 +313,7 @@ class ShopListView(generics.ListAPIView):
     serializer_class = ShopListSerializer
     filter_backends = [SearchFilter]
     search_fields = ['name']
-    #pagination_class = SmallMediumPagination
+    pagination_class = SmallMediumPagination
 
 
 # View para obtener detalles de una tienda específica.
@@ -356,7 +356,7 @@ class PaidBillDebtorView(generics.RetrieveUpdateAPIView):
     queryset = BillDebtor.objects.filter(is_deleted=False)
     serializer_class = PaidBillDebtorSerializer
     permission_classes = (IsAuthenticated,)
-    #pagination_class = SmallMediumPagination
+    pagination_class = SmallMediumPagination
 
 
 #vista para eliminar un deudor
@@ -364,7 +364,7 @@ class RemoveDebtorView(generics.RetrieveUpdateAPIView):
     queryset = Debtor.objects.filter(is_deleted=False)
     serializer_class = RemoveDebtorSerializer
     permission_classes = (IsAuthenticated,)
-    #pagination_class = SmallMediumPagination
+    pagination_class = SmallMediumPagination
 
 
 #vista para los productos de una shop
@@ -393,7 +393,7 @@ class ShopDebtorView(generics.ListAPIView):
     filter_backends = [SearchFilter,DjangoFilterBackend]
     filterset_fields = ['name','creation_date']
     search_fields = ['name']
-    #pagination_class = SmallMediumPagination
+    pagination_class = SmallMediumPagination
 
     def get_queryset(self):
         shop_id = self.kwargs['shop_id']
@@ -412,7 +412,7 @@ class ShopSupplierView(generics.ListAPIView):
     filter_backends = [SearchFilter,DjangoFilterBackend]
     filterset_fields = ['name','creation_date']
     search_fields = ['name']
-    #pagination_class = SmallMediumPagination
+    pagination_class = SmallMediumPagination
 
     def get_queryset(self):
         shop_id = self.kwargs['shop_id']
@@ -430,7 +430,7 @@ class ShopFinancesView(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['type','total','creation_date']
-    #pagination_class = SmallMediumPagination
+    pagination_class = SmallMediumPagination
 
     def get_queryset(self):
         shop_id = self.kwargs['shop_id']
@@ -450,7 +450,7 @@ class BillDebtorView(generics.ListAPIView):
     filter_backends = [SearchFilter,DjangoFilterBackend]
     filterset_fields = ['total_bill']
     search_field = ['total_bill']
-    #pagination_class = SmallMediumPagination
+    pagination_class = SmallMediumPagination
 
     def get_queryset(self):
         debtors_id = self.kwargs['debtors_id']

@@ -41,13 +41,13 @@ def get_tokens_for_user(user):
 class UserListCreate(generics.ListCreateAPIView):
     queryset = Users.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = UserSerializer
-    #permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     #pagination_class = SmallMediumPagination
 
 class UsersDetail(generics.RetrieveUpdateAPIView):
     queryset = Users.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = UserSerializer
-    #permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     #pagination_class = SmallMediumPagination
 
 class UserProfileView(APIView):

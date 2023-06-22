@@ -373,8 +373,8 @@ class ShopListSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance: Shop):
         data = super().to_representation(instance)
-        data['username'] = instance.user_id.username
-        data['phone_number'] = instance.user_id.phone_number
+        data['username'] = instance.user_id.username if instance.user_id is not None else None
+        data['phone_number'] = instance.user_id.phone_number if instance.user_id is not None else None
         return data
 
 

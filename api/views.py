@@ -44,11 +44,13 @@ class UserListCreate(generics.ListCreateAPIView):
     permission_classes = (IsAuthenticated,)
     #pagination_class = SmallMediumPagination
 
+
 class UsersDetail(generics.RetrieveUpdateAPIView):
     queryset = Users.objects.filter(is_deleted=False).order_by('pk')
     serializer_class = UserSerializer
     permission_classes = (IsAuthenticated,)
     #pagination_class = SmallMediumPagination
+
 
 class UserProfileView(APIView):
     renderer_classes = [UserRenderer, ]

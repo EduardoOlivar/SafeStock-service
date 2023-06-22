@@ -39,6 +39,7 @@ class UserSerializer(serializers.ModelSerializer):
         return value
 
 
+
 #serializador para el login del usuario donde se le pide el email y la password
 class UserLoginSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(max_length=255)

@@ -42,7 +42,7 @@ class UserManager(BaseUserManager):
 class Users(AbstractBaseUser, PermissionsMixin,GenericAttributes):
     email = models.EmailField(max_length=255, unique=True, **common_args)
     username = models.TextField(**common_args)
-    image_file = models.FileField(upload_to='uploads/user/images/')
+    image_file = models.FileField(**common_args,upload_to='uploads/user/images/')
     phone_number = models.TextField(**common_args)
     token = models.TextField(**common_args)
     last_session = models.DateTimeField(**common_args,auto_now_add=True)

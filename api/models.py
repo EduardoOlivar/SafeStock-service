@@ -42,7 +42,7 @@ class UserManager(BaseUserManager):
 class Users(AbstractBaseUser, PermissionsMixin,GenericAttributes):
     email = models.EmailField(max_length=255, unique=True, **common_args)
     username = models.TextField(**common_args)
-    image_file = models.FileField(upload_to='user/images/')
+    image_file = models.FileField(upload_to='uploads/user/images/')
     phone_number = models.TextField(**common_args)
     token = models.TextField(**common_args)
     last_session = models.DateTimeField(**common_args,auto_now_add=True)
@@ -102,7 +102,7 @@ class Shop(GenericAttributes):
     ]
     user_id = models.OneToOneField(Users, on_delete=models.CASCADE, **common_args, related_name='shop')
     name = models.TextField(**common_args)
-    image_file = models.FileField(upload_to='shop/images/', **common_args)
+    image_file = models.FileField(upload_to='uploads/shop/images/', **common_args)
     address = models.TextField(**common_args)
     shop_type = models.TextField(**common_args, choices=AVAILABLE_SHOP_TYPE, default='negocio_pequeño')
     open_days = models.IntegerField(**common_args)

@@ -311,7 +311,7 @@ class RemoveShopFinanceView(generics.RetrieveUpdateAPIView):
 
 # View para listar tiendas con capacidad de búsqueda.
 class ShopListView(generics.ListAPIView):
-    queryset = Shop.objects.filter(is_deleted=False)
+    queryset = Shop.objects.filter(is_deleted=False,name__isnull=False,user_id__username__isnull=False)
     serializer_class = ShopListSerializer
     filter_backends = [SearchFilter]
     search_fields = ['name']
